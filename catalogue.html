@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAHIMA PORTES | Catalogue</title>
+
+    <style>
+        :root {
+            --noir: #080808;
+            --noir-clair: #151515;
+            --or: #c9a24d;
+            --or-clair: #f2d58a;
+            --fond: #f5f0e7;
+            --blanc: #ffffff;
+            --texte: #3d3a34;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            color: var(--texte);
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background: var(--fond);
+        }
+
+        header {
+            padding: 15px 7%;
+            background: var(--noir);
+            border-bottom: 1px solid var(--or);
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--or-clair);
+            font-family: Georgia, serif;
+            font-size: 20px;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .logo img {
+            width: 58px;
+            height: 58px;
+            object-fit: contain;
+            background: white;
+            border: 2px solid var(--or);
+            border-radius: 50%;
+        }
+
+        .retour {
+            color: var(--or-clair);
+            text-decoration: none;
+        }
+
+        .retour:hover {
+            color: white;
+        }
+
+        .intro {
+            padding: 65px 20px 75px;
+            color: white;
+            background: var(--noir);
+            text-align: center;
+        }
+
+        .intro small {
+            color: var(--or-clair);
+            font-size: 12px;
+            font-weight: bold;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+        }
+
+        .intro h1 {
+            margin: 15px 0;
+            font-family: Georgia, serif;
+            font-size: clamp(40px, 6vw, 70px);
+            font-weight: normal;
+        }
+
+        .intro h1 span {
+            color: var(--or-clair);
+            font-style: italic;
+        }
+
+        .intro p {
+            max-width: 680px;
+            margin: auto;
+            color: #d6d1c7;
+        }
+
+        .filtres {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 15px;
+            position: relative;
+            width: 86%;
+            max-width: 1150px;
+            margin: -30px auto 0;
+            padding: 25px;
+            background: var(--noir-clair);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, .2);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            color: var(--or-clair);
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d7c8a4;
+            border-radius: 3px;
+            color: var(--texte);
+            background: white;
+        }
+
+        .catalogue {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            max-width: 1250px;
+            margin: auto;
+            padding: 50px 25px 75px;
+        }
+
+        .porte {
+            overflow: hidden;
+            background: var(--blanc);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, .13);
+        }
+
+        .porte img {
+            display: block;
+            width: 100%;
+            height: 340px;
+            object-fit: cover;
+        }
+
+        .informations {
+            padding: 22px;
+        }
+
+        .informations h2 {
+            color: var(--noir);
+            font-family: Georgia, serif;
+            font-size: 23px;
+            font-weight: normal;
+        }
+
+        .type {
+            margin: 5px 0 10px;
+            color: #80632b;
+            font-size: 12px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .description {
+            min-height: 75px;
+        }
+
+        .prix {
+            margin: 14px 0;
+            color: #9b7222;
+            font-family: Georgia, serif;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .details {
+            min-height: 100px;
+            margin-bottom: 18px;
+            list-style: none;
+        }
+
+        .details li::before {
+            content: "✦ ";
+            color: var(--or);
+        }
+
+        .devis,
+        .envoyer {
+            padding: 12px 18px;
+            border: 0;
+            color: var(--or-clair);
+            background: var(--noir);
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .devis:hover,
+        .envoyer:hover {
+            color: var(--noir);
+            background: var(--or);
+        }
+
+        .aucun-resultat {
+            display: none;
+            grid-column: 1 / -1;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .contact {
+            padding: 50px 20px;
+            color: white;
+            background: var(--noir);
+            text-align: center;
+        }
+
+        .contact h2 {
+            margin-bottom: 10px;
+            color: var(--or-clair);
+            font-family: Georgia, serif;
+            font-weight: normal;
+        }
+
+        .contact a {
+            color: var(--or-clair);
+        }
+
+        footer {
+            padding: 22px;
+            color: #aaa;
+            background: #050505;
+            text-align: center;
+        }
+
+        .fenetre {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            position: fixed;
+            inset: 0;
+            z-index: 20;
+            padding: 20px;
+            background: rgba(0, 0, 0, .8);
+        }
+
+        .fenetre.active {
+            display: flex;
+        }
+
+        .formulaire {
+            position: relative;
+            width: 100%;
+            max-width: 580px;
+            max-height: 92vh;
+            overflow-y: auto;
+            padding: 30px;
+            background: var(--fond);
+        }
+
+        .formulaire h2 {
+            color: var(--noir);
+            font-family: Georgia, serif;
+            font-weight: normal;
+        }
+
+        .formulaire p {
+            margin-bottom: 18px;
+            font-size: 14px;
+        }
+
+        .fermer {
+            position: absolute;
+            top: 8px;
+            right: 15px;
+            border: 0;
+            color: var(--noir);
+            background: transparent;
+            cursor: pointer;
+            font-size: 28px;
+        }
+
+        .champ {
+            margin-bottom: 13px;
+        }
+
+        .deux-champs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .envoyer {
+            width: 100%;
+            margin-top: 8px;
+        }
+
+        .note {
+            margin-top: 10px;
+            color: #665d4c;
+            font-size: 12px;
+        }
+
+        @media (max-width: 950px) {
+            .filtres {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .catalogue {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 650px) {
+            nav {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .filtres,
+            .deux-champs {
+                grid-template-columns: 1fr;
+            }
+
+            .catalogue {
+                grid-template-columns: 1fr;
+                padding-right: 7%;
+                padding-left: 7%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <nav>
+            <a class="logo" href="index.html">
+                <img src="logo-fahima.png" alt="Logo Fahima">
+                <span>FAHIMA PORTES</span>
+            </a>
+
+            <a class="retour" href="index.html">
+                Retour à l'accueil
+            </a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="intro">
+            <small>Collection privée 2026</small>
+
+            <h1>Le catalogue <span>FAHIMA</span></h1>
+
+            <p>
+                Découvrez nos portes de caractère, conçues pour associer
+                sécurité, raffinement et personnalité.
+            </p>
+        </section>
+
+        <section class="filtres">
+            <div>
+                <label for="recherche">Rechercher un modèle</label>
+                <input
+                    id="recherche"
+                    type="search"
+                    placeholder="Exemple : prestige, bois..."
+                >
+            </div>
+
+            <div>
+                <label for="categorie">Type de porte</label>
+                <select id="categorie">
+                    <option value="tous">Toutes les portes</option>
+                    <option value="blindee">Porte blindée</option>
+                    <option value="fer-forge">Fer forgé</option>
+                    <option value="simple">Porte simple</option>
+                    <option value="double">Porte double</option>
+                    <option value="chambre">Porte de chambre</option>
+                    <option value="sanitaire">Porte sanitaire</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="prix-min">Prix minimum (€)</label>
+                <input
+                    id="prix-min"
+                    type="number"
+                    min="899.99"
+                    max="8799.99"
+                    step="0.01"
+                    placeholder="899.99"
+                >
+            </div>
+
+            <div>
+                <label for="prix-max">Prix maximum (€)</label>
+                <input
+                    id="prix-max"
+                    type="number"
+                    min="899.99"
+                    max="8799.99"
+                    step="0.01"
+                    placeholder="8799.99"
+                >
+            </div>
+        </section>
+
+        <section class="catalogue">
+
+            <article
+                class="porte"
+                data-nom="geometrique"
+                data-type="blindee fer-forge simple"
+                data-prix="4599.99"
+            >
+                <img src="produit-01.png" alt="Porte blindée noire géométrique">
+
+                <div class="informations">
+                    <h2>Modèle Géométrique</h2>
+                    <p class="type">Porte blindée - Fer forgé - Simple</p>
+                    <p class="description">
+                        Un décor géométrique travaillé pour une entrée moderne et sécurisée.
+                    </p>
+                    <p class="prix">4 599,99 €</p>
+
+                    <ul class="details">
+                        <li>Serrure multipoints</li>
+                        <li>Structure renforcée</li>
+                        <li>Finition noire premium</li>
+                    </ul>
+
+                    <button class="devis" data-produit="Modèle Géométrique">
+                        Demander un devis
+                    </button>
+                </div>
+            </article>
+
+            <article
+                class="porte"
+                data-nom="horizon"
+                data-type="blindee simple"
+                data-prix="5299.99"
+            >
+                <img src="produit-02.png" alt="Porte blindée grise Horizon">
+
+                <div class="informations">
+                    <h2>Modèle Horizon</h2>
+                    <p class="type">Porte blindée - Simple</p>
+                    <p class="description">
+                        Une finition grise élégante avec des lignes horizontales.
+                    </p>
+                    <p class="prix">5 299,99 €</p>
+
+                    <ul class="details">
+                        <li>Blindage renforcé</li>
+                        <li>Poignée longue</li>
+                        <li>Isolation renforcée</li>
+                    </ul>
+
+                    <button class="devis" data-produit="Modèle Horizon">
+                        Demander un devis
+                    </button>
+                </div>
+            </article>
+
+            <article
+                class="porte"
+                data-nom="diagonale"
+                data-type="blindee simple"
+                data-prix="3899.99"
+            >
+                <img src="produit-03.png" alt="Porte blindée Diagonale">
+
+                <div class="informations">
+                    <h2>Modèle Diagonale</h2>
+                    <p class="type">Porte blindée - Simple</p>
+                    <p class="description">
+                        Une finition effet bois avec des lignes diagonales.
+                    </p>
+                    <p class="prix">3 899,99 €</p>
+
+                    <ul class="details">
+                        <li>Blindage renforcé</li>
+                        <li>Finition effet bois</li>
+                        <li>Pose sur devis</li>
+                    </ul>
+
+                    <button class="devis" data-produit="Modèle Diagonale">
+                        Demander un devis
+                    </button>
+                </div>
+            </article>
+
+            <article
+                class="porte"
+                data-nom="lumiere chambre"
+                data-type="chambre simple"
+                data-prix="1899.99"
+            >
+                <img src="produit-04.png" alt="Porte claire de chambre">
+
+                <div class="informations">
+                    <h2>Modèle Lumière</h2>
+                    <p class="type">Porte de chambre - Simple</p>
+                    <p class="description">
+                        Une porte claire et lumineuse avec un insert décoratif.
+                    </p>
+                    <p class="prix">1 899,99 €</p>
+
+                    <ul class="details">
+                        <li>Design élégant</li>
+                        <li>Finition claire</li>
+                        <li>Pose sur devis</li>
+                    </ul>
+
+                    <button class="devis" data-produit="Modèle Lumière">
+                        Demander un devis
+                    </button>
+                </div>
+            </article>
+
+            <article
+                class="porte"
+                data-nom="signature"
+                data-type="blindee simple"
+                data-prix="5799.99"
+            >
+                <img src="produit-05.png" alt="Porte blindée Signature">
+
+                <div class="informations">
+                    <h2>Modèle Signature</h2>
+                    <p class="type">Porte blindée - Simple</p>
+                    <p class="description">
+                        Une porte effet bois avec un panneau central premium.
+                    </p>
+                    <p class="prix">5 799,99 €</p>
+
+                    <ul class="details">
+                        <li>Blindage haute résistance</li>
+                        <li>Finition personnalisable</li>
+                        <li>Serrure sécurisée</li>
+                    </ul>
+
+                    <button class="devis" data-produit="Modèle Signature">
+                        Demander un devis
+                    </button>
+                </div>
+            </article>
+
+            <article
+                class="porte"
+                data-nom="double"
+                data-type="blindee double fer-forge"
+                data-prix="8799.99"
+            >
+                <img src="produit-06.png" alt="Porte blindée double">
+
+                <div class="informations">
+                    <h2>Modèle Double</h2>
+                    <p class="type">Porte blindée - Double - Fer forgé</p>
+                    <p class="description">
+                        Une grande porte double vantail pour les entrées prestigieuses.
+                    </p>
+                    <p class="prix">8 799,99 €</p>
+
+                    <ul class="details">
+                        <li>Double vantail</li>
+                        <li>Poignées ergonomiques</li>
+                        <li>Structure renforcée</li>
+                    </ul>
+
+                    <button class="devis" data-produit="Modèle Double">
+                        Demander un devis
+                    </button>
+                </div>
+            </article>
+
+            <article
+                class="porte"
+                data-nom="contraste"
+                data-type="blindee simple fer-forge"
+                data-prix="6499.99"
+            >
+                <img src="produit-07.png" alt="Porte blindée Contraste">
+
+                <div class="informations">
+                    <h2>Modèle Contraste</h2>
+                    <p class="type">Porte blindée - Simple - Fer forgé</p>
+                    <p class="description">
+                        Un modèle bicolore avec une finition bois sombre.
+                    </p>
+                    <p class="prix">6 499,99 €</p>
+
+                    <ul class="details">
+                        <li>Design bicolore</li>
+                        <li>Serrure sécurisée</li>
+                        <li>Finitions modernes</li>
+                    </ul>
+
+                    <button class="devis" data-produit="Modèle Contraste">
+                        Demander un devis
+                    </button>
+                </div>
+            </article>
+
+            <article
+                class="porte"
+                data-nom="prestige"
+                data-type="double chambre"
+                data-prix="7299.99"
+            >
+                <img src="produit-08.jpg" alt="Porte double Prestige">
+
+                <div class="informations">
+                    <h2>Modèle Prestige</h2>
+                    <p class="type">Porte double - Porte de chambre</p>
+                    <p class="description">
+                        Une porte double effet bois avec vitrages décoratifs.
+                    </p>
+                    <p class="prix">7 299,99 €</p>
+
+                    <ul class="details">
+                        <li>Double vantail</li>
+                        <li>Vitrages décoratifs</li>
+                        <li>Finition bois premium</li>
+                    </ul>
+
+                    <button class="devis" data-produit="Modèle Prestige">
+                        Demander un devis
+                    </button>
+                </div>
+            </article>
+
+            <article
+                class="porte"
+                data-nom="sanitaire"
+                data-type="sanitaire simple"
+                data-prix="899.99"
+            >
+                <img src="produit-04.png" alt="Porte sanitaire">
+
+                <div class="informations">
+                    <h2>Modèle Sanitaire</h2>
+                    <p class="type">Porte sanitaire - Simple</p>
+                    <p class="description">
+                        Une solution claire et pratique pour les espaces sanitaires.
+                    </p>
+                    <p class="prix">899,99 €</p>
+
+                    <ul class="details">
+                        <li>Entretien facile</li>
+                        <li>Finition résistante</li>
+                        <li>Pose sur devis</li>
+                    </ul>
+
+                    <button class="devis" data-produit="Modèle Sanitaire">
+                        Demander un devis
+                    </button>
+                </div>
+            </article>
+
+            <p class="aucun-resultat" id="aucun-resultat">
+                Aucun modèle ne correspond à votre recherche.
+            </p>
+        </section>
+
+        <section class="contact">
+            <h2>Une question ou un projet sur mesure ?</h2>
+            <p>
+                Appelez le
+                <a href="tel:+33784885023">+33 7 84 88 50 23</a>
+                ou écrivez à
+                <a href="mailto:islamefh2@gmail.com">
+                    islamefh2@gmail.com
+                </a>
+            </p>
+        </section>
+    </main>
+
+    <div class="fenetre" id="fenetre">
+        <form class="formulaire" id="formulaire">
+            <button class="fermer" id="fermer" type="button">&times;</button>
+
+            <h2>Demander un devis</h2>
+
+            <p>
+                Remplissez vos coordonnées. Votre logiciel e-mail préparera
+                automatiquement le message.
+            </p>
+
+            <div class="champ">
+                <label for="produit">Modèle choisi</label>
+                <input id="produit" name="produit" readonly>
+            </div>
+
+            <div class="deux-champs">
+                <div class="champ">
+                    <label for="nom">Nom et prénom *</label>
+                    <input id="nom" name="nom" required>
+                </div>
+
+                <div class="champ">
+                    <label for="telephone">Téléphone *</label>
+                    <input id="telephone" name="telephone" type="tel" required>
+                </div>
+            </div>
+
+            <div class="champ">
+                <label for="email">Votre e-mail *</label>
+                <input id="email" name="email" type="email" required>
+            </div>
+
+            <div class="champ">
+                <label for="adresse">Adresse du projet</label>
+                <input id="adresse" name="adresse">
+            </div>
+
+            <div class="champ">
+                <label for="message">Votre demande</label>
+                <textarea id="message" name="message"
+                    placeholder="Dimensions, installation, question..."></textarea>
+            </div>
+
+            <button class="envoyer" type="submit">
+                Envoyer la demande par e-mail
+            </button>
+
+            <p class="note">
+                Après validation, cliquez sur « Envoyer » dans votre logiciel e-mail.
+            </p>
+        </form>
+    </div>
+
+    <footer>
+        &copy; 2026 FAHIMA PORTES - L'élégance de la sécurité.
+    </footer>
+
+    <script>
+        const cartes = document.querySelectorAll(".porte");
+        const recherche = document.querySelector("#recherche");
+        const categorie = document.querySelector("#categorie");
+        const prixMin = document.querySelector("#prix-min");
+        const prixMax = document.querySelector("#prix-max");
+        const aucunResultat = document.querySelector("#aucun-resultat");
+
+        function filtrerProduits() {
+            const texte = recherche.value.toLowerCase().trim();
+            const typeChoisi = categorie.value;
+            const minimum = Number(prixMin.value) || 899.99;
+            const maximum = Number(prixMax.value) || 8799.99;
+            let nombreVisible = 0;
+
+            cartes.forEach(function (carte) {
+                const nom = carte.dataset.nom;
+                const types = carte.dataset.type;
+                const prix = Number(carte.dataset.prix);
+
+                const bonNom = nom.includes(texte);
+                const bonType =
+                    typeChoisi === "tous" || types.includes(typeChoisi);
+                const bonPrix = prix >= minimum && prix <= maximum;
+
+                if (bonNom && bonType && bonPrix) {
+                    carte.style.display = "";
+                    nombreVisible++;
+                } else {
+                    carte.style.display = "none";
+                }
+            });
+
+            aucunResultat.style.display =
+                nombreVisible === 0 ? "block" : "none";
+        }
+
+        recherche.addEventListener("input", filtrerProduits);
+        categorie.addEventListener("change", filtrerProduits);
+        prixMin.addEventListener("input", filtrerProduits);
+        prixMax.addEventListener("input", filtrerProduits);
+
+        const fenetre = document.querySelector("#fenetre");
+        const formulaire = document.querySelector("#formulaire");
+        const produit = document.querySelector("#produit");
+
+        document.querySelectorAll(".devis").forEach(function (bouton) {
+            bouton.addEventListener("click", function () {
+                produit.value = bouton.dataset.produit;
+                fenetre.classList.add("active");
+                document.querySelector("#nom").focus();
+            });
+        });
+
+        document.querySelector("#fermer").addEventListener("click", function () {
+            fenetre.classList.remove("active");
+        });
+
+        fenetre.addEventListener("click", function (event) {
+            if (event.target === fenetre) {
+                fenetre.classList.remove("active");
+            }
+        });
+
+        formulaire.addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            const donnees = new FormData(formulaire);
+
+            const sujet = encodeURIComponent(
+                "Demande de devis - " + donnees.get("produit")
+            );
+
+            const message = encodeURIComponent(
+                "Bonjour FAHIMA PORTES,\n\n" +
+                "Je souhaite demander un devis pour : " +
+                donnees.get("produit") + "\n\n" +
+                "Nom et prénom : " + donnees.get("nom") + "\n" +
+                "Téléphone : " + donnees.get("telephone") + "\n" +
+                "E-mail : " + donnees.get("email") + "\n" +
+                "Adresse du projet : " + donnees.get("adresse") + "\n\n" +
+                "Ma demande :\n" + donnees.get("message")
+            );
+
+            window.location.href =
+                "mailto:islamefh2@gmail.com" +
+                "?subject=" + sujet +
+                "&body=" + message;
+        });
+    </script>
+
+</body>
+</html>
