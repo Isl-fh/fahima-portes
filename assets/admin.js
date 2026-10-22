@@ -1,8 +1,8 @@
 /* Administration FAHIMA PORTES — connexion sécurisée + gestion du catalogue,
    des demandes de devis, des commandes et des avis clients (Firestore). */
-import { firebaseConfig } from "./firebase-config.js?v=20261025";
-import { session, verifierAdmin } from "./session.js?v=20261025";
-import { PRODUITS_INITIAUX } from "./produits-initiaux.js?v=20261025";
+import { firebaseConfig } from "./firebase-config.js?v=20261026";
+import { session, verifierAdmin } from "./session.js?v=20261026";
+import { PRODUITS_INITIAUX } from "./produits-initiaux.js?v=20261026";
 
 const $ = (id) => document.getElementById(id);
 const configure = firebaseConfig.apiKey && firebaseConfig.apiKey !== "A_REMPLIR";
@@ -190,6 +190,9 @@ function ouvrirFormulaire(p) {
   $("p-caract-en").value = (d.en && d.en.f && d.en.f.join("\n") !== (d.fr && d.fr.f || []).join("\n")) ? d.en.f.join("\n") : "";
   $("p-prix").value = d.eur != null ? d.eur : "";
   $("p-image").value = d.img || "";
+  var ap = $("p-apercu");
+  if (d.img && /^data:image\//.test(d.img)) { ap.src = d.img; ap.hidden = false; }
+  else ap.hidden = true;
   $("p-ordre").value = p ? d.ordre : produits.length + 1;
   $("p-visible").checked = p ? !!d.visible : true;
   document.querySelectorAll('#form-produit input[name="type"]').forEach((c) => {
@@ -202,7 +205,56 @@ function ouvrirFormulaire(p) {
 function fermerFormulaire() {
   editionId = null;
   $("form-produit").hidden = true;
+  $("p-apercu").hidden = true;
 }
+
+// ---------- Photo : choix d'un fichier sur l'appareil ----------
+// L'image est redimensionnée, compressée puis enregistrée directement avec
+// l'offre (data URL) — l'admin n'a pas besoin de lien https.
+function compresserPhoto(fichier) {
+  return new Promise(function (res, rej) {
+    if (!/^image\/(png|jpe?g|webp)$/i.test(fichier.type)) return rej(new Error("format non pris en charge (utilisez PNG, JPG ou WebP)"));
+    if (fichier.size > 25 * 1024 * 1024) return rej(new Error("fichier trop volumineux (25 Mo maximum)"));
+    var img = new Image();
+    var urlObjet = URL.createObjectURL(fichier);
+    img.onload = function () {
+      try {
+        URL.revokeObjectURL(urlObjet);
+        var MAX = 1000; // côté maximum en pixels
+        var w = img.naturalWidth, h = img.naturalHeight;
+        if (w > MAX || h > MAX) {
+          var k = Math.min(MAX / w, MAX / h);
+          w = Math.round(w * k); h = Math.round(h * k);
+        }
+        var c = document.createElement("canvas");
+        c.width = w; c.height = h;
+        c.getContext("2d").drawImage(img, 0, 0, w, h);
+        var sortie = c.toDataURL("image/webp", 0.82);
+        if (sortie.indexOf("data:image/webp") !== 0) sortie = c.toDataURL("image/jpeg", 0.82); // navigateurs sans WebP
+        if (sortie.length > 480000) sortie = c.toDataURL("image/jpeg", 0.72); // garantie de taille
+        res(sortie);
+      } catch (e) { rej(e); }
+    };
+    img.onerror = function () { URL.revokeObjectURL(urlObjet); rej(new Error("image illisible")); };
+    img.src = urlObjet;
+  });
+}
+
+$("btn-choisir-photo").addEventListener("click", function () { $("p-fichier").click(); });
+$("p-fichier").addEventListener("change", async function () {
+  var f = $("p-fichier").files && $("p-fichier").files[0];
+  $("p-fichier").value = "";
+  if (!f) return;
+  try {
+    var url = await compresserPhoto(f);
+    $("p-image").value = url;
+    var ap = $("p-apercu");
+    ap.src = url; ap.hidden = false;
+    message(null);
+  } catch (e) {
+    message("Photo impossible à utiliser : " + (e && e.message ? e.message : e));
+  }
+});
 
 function slug(s) {
   return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
@@ -230,10 +282,10 @@ $("form-produit").addEventListener("submit", async (e) => {
   if (!descFr) return message("La description en français est obligatoire.");
   if (!(eur > 0)) return message("Indiquez un prix valide en euros.");
   if (!types.length) return message("Choisissez au moins une catégorie.");
-  if (!img) return message("Indiquez une image (nom de fichier ou adresse https).");
-  // Image : nom de fichier du site (produit-XX.webp…) ou adresse https complète
-  if (!/^(https:\/\/[^\s"']+|[a-z0-9][a-z0-9-_.]*\.(webp|png|jpe?g))$/i.test(img))
-    return message("Image non valide : indiquez un nom de fichier du site (ex. produit-10.webp) ou une adresse https complète.");
+  if (!img) return message("Indiquez une image : choisissez une photo sur votre appareil ou un nom de fichier du site.");
+  // Image : photo choisie sur l'appareil (data URL), nom de fichier du site ou adresse https
+  if (!/^(https:\/\/[^\s"']+|data:image\/(webp|jpeg|png);base64,[A-Za-z0-9+\/=]+|[a-z0-9][a-z0-9-_.]*\.(webp|png|jpe?g))$/i.test(img))
+    return message("Image non valide : choisissez une photo sur votre appareil (bouton prévu), un nom de fichier du site (ex. produit-10.webp) ou une adresse https complète.");
   if (!(ordre >= 1)) return message("Indiquez une position valide (1 ou plus).");
 
   const fr = { n: nomFr, d: descFr, f: lignes("p-caract-fr") };

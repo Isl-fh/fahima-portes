@@ -133,3 +133,5 @@ html[lang="ar"] #vue-dash h2 { font-family: inherit; }
   .deux { grid-template-columns: 1fr; }
   .tel { grid-template-columns: 96px 1fr; }
 }
+
+.alerte { color: #ffd9dc; }

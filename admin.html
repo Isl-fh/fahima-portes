@@ -15,7 +15,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/site.css">
-    <script src="assets/i18n.js?v=20261025"></script>
+    <script src="assets/i18n.js?v=20261026"></script>
     <link rel="stylesheet" href="assets/admin.css">
 </head>
 <body>
@@ -148,8 +148,8 @@
                         <textarea id="p-caract-en" rows="3" maxlength="400"></textarea>
                     </div>
                     <div class="champ">
-                        <label for="p-image">Image (nom de fichier du site ou adresse https)</label>
-                        <input id="p-image" list="images-existantes" dir="ltr" required maxlength="300">
+                        <label for="p-image">Image</label>
+                        <input id="p-image" list="images-existantes" dir="ltr" required>
                         <datalist id="images-existantes">
                             <option value="produit-00.webp"></option><option value="produit-01.webp"></option>
                             <option value="produit-02.webp"></option><option value="produit-03.webp"></option>
@@ -157,6 +157,12 @@
                             <option value="produit-06.webp"></option><option value="produit-07.webp"></option>
                             <option value="produit-08.webp"></option><option value="produit-09.webp"></option>
                         </datalist>
+                        <div class="zone-photo">
+                            <button type="button" class="principal" id="btn-choisir-photo">Choisir une photo sur mon appareil</button>
+                            <input id="p-fichier" type="file" accept="image/png,image/jpeg,image/webp" hidden>
+                            <img id="p-apercu" alt="" hidden>
+                            <p class="info-photo">La photo est optimisée et enregistrée avec l'offre — aucun lien à copier.</p>
+                        </div>
                     </div>
                     <div class="champ">
                         <label for="p-ordre">Position dans le catalogue (1 = premier)</label>
@@ -237,6 +243,6 @@
         <p>&copy; 2026 <span data-i18n="footer.text">FAHIMA PORTES</span></p>
         <p class="rate" data-rate></p>
     </footer>
-    <script type="module" src="assets/admin.js?v=20261025"></script>
+    <script type="module" src="assets/admin.js?v=20261026"></script>
 </body>
 </html>
