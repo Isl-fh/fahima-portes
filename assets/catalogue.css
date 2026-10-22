@@ -317,3 +317,9 @@ html[dir="rtl"] .details li::before { content: "✦ "; }
 }
 .envoyer.wa:hover { color: var(--noir); background: #5fd468; box-shadow: none; }
 .contact-whatsapp { margin-top: 14px; }
+
+/* Contraste des étiquettes du formulaire de devis */
+.formulaire label { color: #7a5c10; }
+
+/* Masque le bouton WhatsApp flottant quand la modale de devis est ouverte */
+.fenetre.active ~ .wa-float { display: none; }

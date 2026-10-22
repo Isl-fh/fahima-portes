@@ -165,23 +165,21 @@
     window.location.href = "mailto:islamefh2@gmail.com?subject=" + sujet + "&body=" + corps;
   });
 
-  // Envoi du devis par WhatsApp
+  // Envoi du devis par WhatsApp (message dans la langue active)
   document.getElementById("envoyer-wa").addEventListener("click", function () {
+    if (!formulaire.reportValidity()) return;
     var d = new FormData(formulaire);
-    if (!d.get("nom") || !d.get("telephone") || !d.get("email")) {
-      document.getElementById("nom").focus();
-      return;
-    }
-    var nomFr = produitChoisi ? produitChoisi.fr.n : d.get("produit");
+    var L = FH.etat.lang;
+    var prod = produitChoisi ? (produitChoisi[L] || produitChoisi.fr) : null;
+    var nomModele = prod ? prod.n : d.get("produit");
     var prixTxt = produitChoisi ? FH.prix(produitChoisi.eur) : "";
     var msg =
-      "Bonjour FAHIMA PORTES,\n\n" +
-      "Je souhaite demander un devis pour : " + nomFr + (prixTxt ? " (" + prixTxt + ")" : "") + "\n\n" +
-      "Nom et prénom : " + d.get("nom") + "\n" +
-      "Téléphone : " + d.get("telephone") + "\n" +
-      "E-mail : " + d.get("email") + "\n" +
-      "Adresse du projet : " + d.get("adresse") + "\n\n" +
-      "Ma demande :\n" + d.get("message");
+      FH.t("form.wa.intro") + " : " + nomModele + (prixTxt ? " (" + prixTxt + ")" : "") + "\n\n" +
+      FH.t("form.wa.name") + " : " + d.get("nom") + "\n" +
+      FH.t("form.wa.phone") + " : " + d.get("telephone") + "\n" +
+      FH.t("form.wa.email") + " : " + d.get("email") + "\n" +
+      FH.t("form.wa.address") + " : " + d.get("adresse") + "\n\n" +
+      FH.t("form.wa.msg") + " :\n" + d.get("message");
     window.open("https://wa.me/33784885023?text=" + encodeURIComponent(msg), "_blank", "noopener");
   });
 

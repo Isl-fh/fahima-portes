@@ -255,6 +255,19 @@ html[dir="rtl"] .logo-btn .badge { right: auto; left: -4px; }
   .flag { width: 24px; height: 16px; }
 }
 
+/* ---------- Lien WhatsApp doré ---------- */
+.lien-whatsapp {
+  display: inline-flex; align-items: center; gap: 9px;
+  padding: 11px 20px; margin-top: 6px;
+  border: 1px solid #3fae4a; border-radius: 4px;
+  color: #5fd468; background: rgba(63,174,74,.08);
+  font-family: Arial, sans-serif; font-size: 14px; font-weight: bold;
+  text-decoration: none; transition: background .25s, color .25s, transform .25s;
+}
+html[lang="ar"] .lien-whatsapp { font-family: inherit; }
+.lien-whatsapp svg { width: 20px; height: 20px; }
+.lien-whatsapp:hover { color: var(--noir); background: #5fd468; transform: translateY(-2px); }
+
 /* ---------- Bouton WhatsApp flottant ---------- */
 .wa-float {
   position: fixed; bottom: 22px; inset-inline-end: 22px; z-index: 90;
@@ -269,4 +282,7 @@ html[dir="rtl"] .logo-btn .badge { right: auto; left: -4px; }
 .wa-float svg { width: 30px; height: 30px; }
 @media (max-width: 640px) {
   .wa-float { width: 52px; height: 52px; bottom: 16px; inset-inline-end: 16px; }
+}
+@media (max-width: 640px) {
+  .site-footer { padding-bottom: 80px; }
 }
