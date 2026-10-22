@@ -72,8 +72,8 @@ uniquement après ces tests.
    créez votre compte avec votre e-mail personnel.
 2. Dans la console Firebase : **Authentication > Utilisateurs**, et copiez
    l'**UID** de votre compte (colonne « UID utilisateur »).
-3. Dans **Firestore Database**, cliquez **« Démarrer une collection »** :
-   - ID de collection : `admins`
+3. Dans **Firestore Database**, ouvrez la collection `admins` (déjà créée)
+   et cliquez **« Ajouter un document »** :
    - ID du document : **collez votre UID**
    - Champ : `role`, valeur : `admin`
 4. C'est tout. Pour ajouter un autre administrateur plus tard, refaites
@@ -85,8 +85,10 @@ uniquement après ces tests.
    **Administration** dans votre espace client). Tant que la nouvelle version
    n'est pas publiée, faites-le sur l'aperçu ; l'adresse
    `www.fh-portes.com/admin.html` fonctionnera après publication.
-2. Cliquez sur **« Importer le catalogue actuel »** : les 8 modèles entrent
-   dans la base. Ce bouton disparaît ensuite.
+2. Les 8 modèles actuels ont **déjà été importés** dans la base lors des tests :
+   le bouton « Importer le catalogue actuel » ne s'affiche plus, c'est normal.
+   (S'il s'affichait malgré tout, cliquer dessus ne modifierait rien : l'import
+   n'écrase jamais les offres existantes.)
 3. Vous pouvez maintenant **ajouter des offres**, **changer les prix**,
    **modifier les descriptions** (français obligatoire ; arabe et anglais
    facultatifs — le français sert de repli), **masquer** ou **supprimer**.
@@ -107,3 +109,17 @@ uniquement après ces tests.
 - Les règles de sécurité du fichier `firestore.rules` doivent être publiées
   dans la console Firebase (étape 4) : leur simple présence dans le dépôt ne
   protège rien tant qu'elles n'y sont pas collées et publiées.
+
+## Nettoyage des comptes de test (avant la mise en ligne)
+
+Deux comptes temporaires ont été créés pour la validation :
+
+1. Dans **Firestore Database > admins**, supprimez le document
+   `CKOHYbamr8YocQW5iblT47bpr0l1` (compte de test administrateur). Ne vous
+   contentez pas de modifier son champ `role` : tant que le document existe,
+   le compte garde ses droits.
+2. Dans **Authentication > Utilisateurs**, supprimez `test-qa@fahima-portes.com`
+   et `test-qa2@fahima-portes.com`.
+
+À faire uniquement après avoir créé votre propre compte administrateur
+   (étape 7) et vérifié que vous accédez bien à l'administration.
