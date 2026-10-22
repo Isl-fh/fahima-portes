@@ -14,6 +14,19 @@ export const session = {
   db: null
 };
 
+/* stockage peut être indisponible (cadre restreint, navigation privée) :
+   on bascule alors sur un stockage en mémoire sans faire planter la page. */
+const stockage = (() => {
+  try {
+    const t = window.localStorage;
+    t.setItem("__fh_test", "1");
+    t.removeItem("__fh_test");
+    return t;
+  } catch {
+    return { getItem: () => null, setItem: () => {}, removeItem: () => {} };
+  }
+})();
+
 const configure = firebaseConfig.apiKey && firebaseConfig.apiKey !== "A_REMPLIR";
 const quand = demarrer();
 session.quand = quand;
