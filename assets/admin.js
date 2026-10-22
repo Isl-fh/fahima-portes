@@ -1,8 +1,8 @@
 /* Administration FAHIMA PORTES — connexion sécurisée + gestion du catalogue,
    des demandes de devis, des commandes et des avis clients (Firestore). */
-import { firebaseConfig } from "./firebase-config.js?v=20261024";
-import { session, verifierAdmin } from "./session.js?v=20261024";
-import { PRODUITS_INITIAUX } from "./produits-initiaux.js?v=20261024";
+import { firebaseConfig } from "./firebase-config.js?v=20261025";
+import { session, verifierAdmin } from "./session.js?v=20261025";
+import { PRODUITS_INITIAUX } from "./produits-initiaux.js?v=20261025";
 
 const $ = (id) => document.getElementById(id);
 const configure = firebaseConfig.apiKey && firebaseConfig.apiKey !== "A_REMPLIR";
