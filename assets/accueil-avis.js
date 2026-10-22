@@ -1,5 +1,5 @@
 /* Page d'accueil — témoignages réels (collection « avis ») + formulaire de note. */
-import { session } from "./session.js?v=20261029";
+import { session } from "./session.js?v=20261030";
 
 (function () {
   "use strict";

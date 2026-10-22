@@ -47,17 +47,9 @@ function memoriser(user) {
 function majEnTete(user) {
   document.querySelectorAll(".account-link").forEach(function (a) {
     var span = a.querySelector("[data-account-label]");
-    /* Icône bonhomme affichée pour tous les utilisateurs ; le libellé
-       « Se connecter » n'apparaît que lorsque personne n'est connecté. */
-    if (!a.querySelector(".compte-icone")) {
-      var icone = document.createElement("span");
-      icone.className = "compte-icone";
-      icone.innerHTML =
-        '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm0 1.5c-4.4 0-8 2.4-8 5.3V20h16v-1.2c0-2.9-3.6-5.3-8-5.3Z"/></svg>';
-      a.appendChild(icone);
-    }
-    /* Le libellé « Se connecter » est remplacé par l'icône pour tous ;
-       le nom du bouton reste lisible pour les lecteurs d'écran. */
+    /* L'icône bonhomme du lien est affichée pour tous les utilisateurs ;
+       le libellé « Se connecter » disparaît. Le nom du bouton reste
+       lisible pour les lecteurs d'écran. */
     if (span) span.hidden = true;
     a.setAttribute("aria-label", user ? (user.displayName || user.email) : (window.FH ? FH.t("nav.login") : ""));
     if (user) {
