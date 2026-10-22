@@ -202,8 +202,11 @@ import { firebaseConfig } from "./firebase-config.js";
       var app = mods[0].initializeApp(firebaseConfig);
       var F = mods[1];
       var bdd = F.getFirestore(app);
-      var snap = await F.getDocs(F.query(F.collection(bdd, "products"), F.where("visible", "==", true), F.orderBy("ordre")));
-      PRODUITS = snap.docs.map(function (d) { return Object.assign({ id: d.id }, d.data()); });
+      // Requête publique simple (filtre visible uniquement, sans orderBy :
+      // un index composé serait sinon exigé par Firestore). Tri côté navigateur.
+      var snap = await F.getDocs(F.query(F.collection(bdd, "products"), F.where("visible", "==", true)));
+      PRODUITS = snap.docs.map(function (d) { return Object.assign({ id: d.id }, d.data()); })
+        .sort(function (a, b) { return (a.ordre || 999) - (b.ordre || 999); });
       etatCatalogue = "pret";
       rendre();
       majInfoCatalogue();
