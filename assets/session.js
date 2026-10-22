@@ -85,7 +85,7 @@ async function demarrer() {
      sinon en mémoire (cadre restreint, navigation privée) — sinon la
      connexion elle-même échoue avec une SecurityError. */
   try {
-    await A.setPersistence(session.auth, stockageLocal ? A.browserLocalPersistence : A.browserInMemoryPersistence);
+    await A.setPersistence(session.auth, stockageLocal ? A.browserLocalPersistence : A.inMemoryPersistence);
   } catch (e) { console.warn("Persistance Firebase indisponible", e); }
   session.db = F.getFirestore(app);
   if (window.FH) session.auth.languageCode = FH.etat.lang;
