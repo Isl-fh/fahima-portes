@@ -114,6 +114,12 @@ function afficherTableau(user) {
   window.__fhUser = user;
   $("vue-auth").hidden = !!user;
   $("vue-dash").hidden = !user;
+  /* Colonne de gauche : texte adapté à l'état connecté ou non */
+  const intro = document.querySelector('.panneau-gauche p[data-i18n^="acc.intro"]');
+  if (intro) {
+    intro.setAttribute("data-i18n", user ? "acc.intro.co" : "acc.intro");
+    intro.textContent = t(user ? "acc.intro.co" : "acc.intro");
+  }
   verifierAdmin(user).then((r) => { const el = $("dash-admin"); if (el) el.hidden = !r.admin; });
   if (!user) return;
   const prenom = (user.displayName || "").split(" ")[0] || "";
