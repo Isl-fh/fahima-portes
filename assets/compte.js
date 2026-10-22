@@ -1,7 +1,7 @@
 /* Espace client FAHIMA PORTES — connexion, inscription et tableau de bord :
    profil, demandes de devis, commandes, favoris et avis. */
-import { firebaseConfig, DOMAINE_TEL, TEL_ACTIF } from "./firebase-config.js";
-import { session, verifierAdmin } from "./session.js";
+import { firebaseConfig, DOMAINE_TEL, TEL_ACTIF } from "./firebase-config.js?v=20261023";
+import { session, verifierAdmin } from "./session.js?v=20261023";
 
 // Inscription / connexion par téléphone (SMS) : désactivée dans cette version.
 if (!TEL_ACTIF) {
