@@ -1,8 +1,8 @@
 /* Administration FAHIMA PORTES — connexion sécurisée + gestion du catalogue,
    des demandes de devis, des commandes et des avis clients (Firestore). */
-import { firebaseConfig } from "./firebase-config.js?v=20261026";
-import { session, verifierAdmin } from "./session.js?v=20261026";
-import { PRODUITS_INITIAUX } from "./produits-initiaux.js?v=20261026";
+import { firebaseConfig } from "./firebase-config.js?v=20261027";
+import { session, verifierAdmin } from "./session.js?v=20261027";
+import { PRODUITS_INITIAUX } from "./produits-initiaux.js?v=20261027";
 
 const $ = (id) => document.getElementById(id);
 const configure = firebaseConfig.apiKey && firebaseConfig.apiKey !== "A_REMPLIR";
@@ -220,18 +220,32 @@ function compresserPhoto(fichier) {
     img.onload = function () {
       try {
         URL.revokeObjectURL(urlObjet);
-        var MAX = 1000; // côté maximum en pixels
+        var LIMITE = 480000; // caractères maximum pour la data URL
         var w = img.naturalWidth, h = img.naturalHeight;
-        if (w > MAX || h > MAX) {
-          var k = Math.min(MAX / w, MAX / h);
-          w = Math.round(w * k); h = Math.round(h * k);
+        var sortie = null;
+        // On réduit la taille puis la qualité jusqu'à respecter la limite
+        var essais = 0;
+        while (essais < 6) {
+          if (w > 1000 || h > 1000) {
+            var k = Math.min(1000 / w, 1000 / h);
+            w = Math.round(w * k); h = Math.round(h * k);
+          }
+          var c = document.createElement("canvas");
+          c.width = w; c.height = h;
+          c.getContext("2d").drawImage(img, 0, 0, w, h);
+          var qualites = essais === 0 ? [0.82, 0.7] : [0.6, 0.45];
+          for (var q = 0; q < qualites.length && (!sortie || sortie.length > LIMITE); q++) {
+            sortie = c.toDataURL("image/webp", qualites[q]);
+            if (sortie.indexOf("data:image/webp") !== 0) { // navigateur sans WebP : JPEG
+              sortie = c.toDataURL("image/jpeg", qualites[q]);
+              if (q === 0 && sortie.length > LIMITE) sortie = c.toDataURL("image/jpeg", 0.6);
+            }
+          }
+          if (sortie && sortie.length <= LIMITE) break;
+          w = Math.round(w * 0.75); h = Math.round(h * 0.75); // on réduit et on recommence
+          essais++;
         }
-        var c = document.createElement("canvas");
-        c.width = w; c.height = h;
-        c.getContext("2d").drawImage(img, 0, 0, w, h);
-        var sortie = c.toDataURL("image/webp", 0.82);
-        if (sortie.indexOf("data:image/webp") !== 0) sortie = c.toDataURL("image/jpeg", 0.82); // navigateurs sans WebP
-        if (sortie.length > 480000) sortie = c.toDataURL("image/jpeg", 0.72); // garantie de taille
+        if (!sortie || sortie.length > LIMITE) return rej(new Error("photo trop lourde même après compression — essayez une image plus petite"));
         res(sortie);
       } catch (e) { rej(e); }
     };
