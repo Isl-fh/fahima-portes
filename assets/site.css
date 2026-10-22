@@ -1,0 +1,288 @@
+/* FAHIMA PORTES — styles communes (en-tête, barre supérieure, pied de page, RTL) */
+:root {
+  --noir: #080808;
+  --noir-clair: #151515;
+  --or: #c9a24d;
+  --or-clair: #f2d58a;
+  --rouge: #e3262d;
+  --marine: #141a3a;
+  --blanc: #ffffff;
+  --gris: #cfcfcf;
+}
+
+[hidden] { display: none !important; }
+
+html[dir="rtl"] body,
+html[lang="ar"] body {
+  font-family: "Noto Kufi Arabic", "Segoe UI", Tahoma, Arial, sans-serif;
+}
+html[lang="ar"] h1,
+html[lang="ar"] h2,
+html[lang="ar"] h3 {
+  font-family: "Noto Kufi Arabic", "Segoe UI", Tahoma, Arial, sans-serif;
+  font-style: normal !important;
+  letter-spacing: 0 !important;
+  line-height: 1.35;
+}
+html[lang="ar"] .sur-titre,
+html[lang="ar"] .petit-titre,
+html[lang="ar"] .kicker { letter-spacing: 0 !important; }
+
+/* ---------- En-tête ---------- */
+.site-header {
+  position: relative;
+  z-index: 30;
+  width: 100%;
+  background: rgba(8, 8, 8, .92);
+  border-bottom: 1px solid rgba(201, 162, 77, .35);
+  font-family: Arial, sans-serif;
+  backdrop-filter: blur(6px);
+}
+.site-header.transparent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: linear-gradient(180deg, rgba(8, 8, 8, .85), rgba(8, 8, 8, .45));
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 7px 7%;
+  border-bottom: 1px solid rgba(201, 162, 77, .18);
+  color: #bdb6a6;
+  font-size: 12px;
+}
+.topbar .tagline { letter-spacing: .5px; }
+html[lang="ar"] .topbar .tagline { letter-spacing: 0; }
+
+.topbar-tools {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-inline-start: auto;
+}
+
+.flags {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.flag {
+  display: block;
+  width: 27px;
+  height: 18px;
+  overflow: hidden;
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .25);
+}
+.flag svg { display: block; width: 100%; height: 100%; }
+
+.switch {
+  display: inline-flex;
+  padding: 2px;
+  border: 1px solid rgba(201, 162, 77, .45);
+  border-radius: 20px;
+}
+.switch button {
+  min-width: 34px;
+  padding: 4px 9px;
+  border: 0;
+  border-radius: 16px;
+  color: #e9e3d4;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: bold;
+  transition: background .2s, color .2s;
+}
+.switch button:hover { color: var(--or-clair); }
+.switch button[aria-pressed="true"] {
+  color: var(--noir);
+  background: var(--or-clair);
+}
+.switch button:focus-visible,
+.logo-btn:focus-visible,
+.brand:focus-visible {
+  outline: 2px solid var(--or-clair);
+  outline-offset: 2px;
+}
+
+.mainnav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 22px;
+  padding: 12px 7%;
+}
+.brand-group {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+}
+
+.logo-btn {
+  position: relative;
+  display: block;
+  flex: none;
+  width: 62px;
+  height: 62px;
+  border: 2px solid var(--or);
+  border-radius: 50%;
+  background: var(--blanc);
+  transition: transform .25s, box-shadow .25s;
+}
+.logo-btn:hover {
+  box-shadow: 0 0 0 4px rgba(242, 213, 138, .25);
+  transform: scale(1.05);
+}
+.logo-btn img {
+  width: 100%;
+  height: 100%;
+  padding: 5px;
+  border-radius: 50%;
+  object-fit: contain;
+}
+.logo-btn .badge {
+  position: absolute;
+  right: -4px;
+  bottom: -2px;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--noir);
+  border-radius: 50%;
+  color: var(--noir);
+  background: var(--or-clair);
+}
+html[dir="rtl"] .logo-btn .badge { right: auto; left: -4px; }
+.logo-btn .badge svg { width: 12px; height: 12px; }
+
+.brand {
+  color: var(--or-clair);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 19px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.brand small {
+  display: block;
+  color: #a9a291;
+  font-family: Arial, sans-serif;
+  font-size: 11px;
+  font-weight: normal;
+  letter-spacing: .5px;
+}
+
+.navigation {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 26px;
+}
+.navigation a {
+  color: var(--blanc);
+  font-size: 14px;
+  letter-spacing: .5px;
+  text-decoration: none;
+  transition: color .3s;
+}
+.navigation a:hover { color: var(--or-clair); }
+.navigation .catalogue-link {
+  padding: 10px 18px;
+  border: 1px solid var(--or);
+  border-radius: 25px;
+  color: var(--or-clair);
+}
+.navigation .catalogue-link:hover {
+  color: var(--noir);
+  background: var(--or-clair);
+}
+.navigation .account-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.navigation .account-link svg { width: 16px; height: 16px; }
+
+/* ---------- Pied de page ---------- */
+.site-footer {
+  padding: 34px 7% 26px;
+  border-top: 1px solid rgba(201, 162, 77, .35);
+  color: #a8a8a8;
+  background: #050505;
+  font-family: Arial, sans-serif;
+  font-size: 13px;
+  text-align: center;
+}
+.site-footer img {
+  width: 54px;
+  height: 54px;
+  margin-bottom: 10px;
+  padding: 4px;
+  border-radius: 50%;
+  background: #fff;
+}
+.site-footer .rate { margin-top: 6px; color: #7d786d; font-size: 12px; }
+.site-footer .flags { justify-content: center; margin: 12px 0 0; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 860px) {
+  .navigation { gap: 16px; }
+  .navigation .hide-sm { display: none; }
+}
+@media (max-width: 640px) {
+  .topbar { padding: 7px 5%; }
+  .topbar .tagline { display: none; }
+  .topbar-tools { width: 100%; justify-content: flex-start; gap: 8px; }
+  .topbar-tools > .switch:last-child { margin-inline-start: auto; }
+  .site-header.transparent { position: relative; background: var(--noir); }
+  .mainnav { flex-wrap: wrap; gap: 12px; padding: 12px 5%; }
+  .logo-btn { width: 52px; height: 52px; }
+  .brand { font-size: 17px; }
+  .navigation { width: 100%; justify-content: space-between; gap: 10px; }
+  .navigation a { font-size: 13px; }
+  .navigation .catalogue-link { padding: 8px 14px; }
+}
+@media (max-width: 380px) {
+  .switch button { min-width: 30px; padding: 4px 7px; }
+  .flag { width: 24px; height: 16px; }
+}
+
+/* ---------- Lien WhatsApp doré ---------- */
+.lien-whatsapp {
+  display: inline-flex; align-items: center; gap: 9px;
+  padding: 11px 20px; margin-top: 6px;
+  border: 1px solid #3fae4a; border-radius: 4px;
+  color: #5fd468; background: rgba(63,174,74,.08);
+  font-family: Arial, sans-serif; font-size: 14px; font-weight: bold;
+  text-decoration: none; transition: background .25s, color .25s, transform .25s;
+}
+html[lang="ar"] .lien-whatsapp { font-family: inherit; }
+.lien-whatsapp svg { width: 20px; height: 20px; }
+.lien-whatsapp:hover { color: var(--noir); background: #5fd468; transform: translateY(-2px); }
+
+/* ---------- Bouton WhatsApp flottant ---------- */
+.wa-float {
+  position: fixed; bottom: 22px; inset-inline-end: 22px; z-index: 90;
+  display: grid; place-items: center;
+  width: 58px; height: 58px;
+  border-radius: 50%;
+  color: #fff; background: #25d366;
+  box-shadow: 0 6px 18px rgba(37,211,102,.45);
+  transition: transform .25s, box-shadow .25s;
+}
+.wa-float:hover { transform: scale(1.08); box-shadow: 0 8px 24px rgba(37,211,102,.6); }
+.wa-float svg { width: 30px; height: 30px; }
+@media (max-width: 640px) {
+  .wa-float { width: 52px; height: 52px; bottom: 16px; inset-inline-end: 16px; }
+}
+@media (max-width: 640px) {
+  .site-footer { padding-bottom: 80px; }
+}

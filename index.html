@@ -3,348 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="FAHIMA PORTE BLINDE - Portes blindées de luxe, élégantes et sécurisées.">
-    <title>FAHIMA PORTES | L'élégance de la sécurité</title>
-
-    <style>
-        :root {
-            --noir: #080808;
-            --noir-clair: #151515;
-            --or: #c9a24d;
-            --or-clair: #f2d58a;
-            --blanc: #ffffff;
-            --gris: #cfcfcf;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            color: var(--blanc);
-            font-family: Georgia, "Times New Roman", serif;
-            background: var(--noir);
-        }
-
-        header {
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 10;
-            width: 100%;
-            padding: 22px 7%;
-            border-bottom: 1px solid rgba(201, 162, 77, .35);
-            background: rgba(8, 8, 8, .55);
-        }
-
-        nav {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 25px;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 13px;
-            color: var(--or-clair);
-            font-family: Arial, sans-serif;
-            font-size: 19px;
-            font-weight: bold;
-            letter-spacing: 1px;
-            text-decoration: none;
-        }
-
-        .logo img {
-            width: 58px;
-            height: 58px;
-            object-fit: contain;
-            background: var(--blanc);
-            border: 2px solid var(--or);
-            border-radius: 50%;
-        }
-
-        .navigation {
-            display: flex;
-            align-items: center;
-            gap: 30px;
-            font-family: Arial, sans-serif;
-        }
-
-        .navigation a {
-            color: var(--blanc);
-            font-size: 14px;
-            letter-spacing: 1px;
-            text-decoration: none;
-            transition: color .3s;
-        }
-
-        .navigation a:hover {
-            color: var(--or-clair);
-        }
-
-        .navigation .catalogue-link {
-            padding: 11px 19px;
-            border: 1px solid var(--or);
-            border-radius: 25px;
-            color: var(--or-clair);
-        }
-
-        .navigation .catalogue-link:hover {
-            color: var(--noir);
-            background: var(--or-clair);
-        }
-
-        .hero {
-            position: relative;
-            display: flex;
-            align-items: center;
-            min-height: 100vh;
-            padding: 150px 8% 100px;
-            overflow: hidden;
-            background:
-                linear-gradient(90deg, rgba(0, 0, 0, .96) 5%, rgba(0, 0, 0, .78) 44%, rgba(0, 0, 0, .25)),
-                url("produit-00.png") center/cover;
-        }
-
-        .hero::after {
-            position: absolute;
-            top: 14%;
-            right: 7%;
-            width: 300px;
-            height: 300px;
-            border: 1px solid rgba(201, 162, 77, .45);
-            border-radius: 50%;
-            content: "";
-            opacity: .7;
-        }
-
-        .hero-content {
-            position: relative;
-            z-index: 1;
-            max-width: 720px;
-        }
-
-        .ligne-or {
-            display: block;
-            width: 90px;
-            height: 2px;
-            margin-bottom: 25px;
-            background: var(--or);
-        }
-
-        .sur-titre {
-            color: var(--or-clair);
-            font-family: Arial, sans-serif;
-            font-size: 13px;
-            font-weight: bold;
-            letter-spacing: 5px;
-            text-transform: uppercase;
-        }
-
-        h1 {
-            margin: 22px 0;
-            font-size: clamp(46px, 7vw, 92px);
-            font-weight: normal;
-            line-height: 1.02;
-        }
-
-        h1 span {
-            color: var(--or-clair);
-            font-style: italic;
-        }
-
-        .hero-description {
-            max-width: 590px;
-            color: var(--gris);
-            font-family: Arial, sans-serif;
-            font-size: 17px;
-            line-height: 1.8;
-        }
-
-        .actions {
-            display: flex;
-            align-items: center;
-            gap: 25px;
-            margin-top: 35px;
-        }
-
-        .bouton-or {
-            display: inline-block;
-            padding: 16px 30px;
-            color: var(--noir);
-            background: linear-gradient(135deg, var(--or-clair), var(--or));
-            border-radius: 2px;
-            box-shadow: 0 8px 22px rgba(201, 162, 77, .22);
-            font-family: Arial, sans-serif;
-            font-weight: bold;
-            text-decoration: none;
-            transition: transform .3s, box-shadow .3s;
-        }
-
-        .bouton-or:hover {
-            box-shadow: 0 10px 30px rgba(242, 213, 138, .4);
-            transform: translateY(-4px);
-        }
-
-        .bouton-simple {
-            color: var(--or-clair);
-            font-family: Arial, sans-serif;
-            text-decoration: none;
-        }
-
-        .bouton-simple:hover {
-            text-decoration: underline;
-        }
-
-        .prestige {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1px;
-            background: var(--or);
-        }
-
-        .prestige-item {
-            padding: 35px 25px;
-            background: var(--noir-clair);
-            text-align: center;
-        }
-
-        .prestige-item .icone {
-            display: block;
-            margin-bottom: 12px;
-            color: var(--or-clair);
-            font-size: 25px;
-        }
-
-        .prestige-item h2 {
-            margin-bottom: 8px;
-            color: var(--or-clair);
-            font-size: 19px;
-            font-weight: normal;
-        }
-
-        .prestige-item p {
-            color: var(--gris);
-            font-family: Arial, sans-serif;
-            font-size: 14px;
-            line-height: 1.6;
-        }
-
-        .presentation {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            align-items: center;
-            gap: 60px;
-            padding: 100px 8%;
-            background: #101010;
-        }
-
-        .presentation-image {
-            width: 100%;
-            max-height: 550px;
-            object-fit: cover;
-            border: 1px solid var(--or);
-        }
-
-        .presentation h2 {
-            margin: 15px 0;
-            color: var(--or-clair);
-            font-size: clamp(32px, 4vw, 52px);
-            font-weight: normal;
-        }
-
-        .presentation p {
-            color: var(--gris);
-            font-family: Arial, sans-serif;
-            line-height: 1.8;
-        }
-
-        .petit-titre {
-            color: var(--or);
-            font-family: Arial, sans-serif;
-            font-size: 13px;
-            font-weight: bold;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-        }
-
-        footer {
-            padding: 25px;
-            border-top: 1px solid rgba(201, 162, 77, .35);
-            color: #a8a8a8;
-            background: #050505;
-            font-family: Arial, sans-serif;
-            font-size: 13px;
-            text-align: center;
-        }
-
-        @media (max-width: 750px) {
-            header {
-                position: relative;
-                background: var(--noir);
-            }
-
-            nav,
-            .navigation,
-            .actions {
-                flex-direction: column;
-            }
-
-            nav {
-                gap: 20px;
-            }
-
-            .navigation {
-                gap: 15px;
-            }
-
-            .hero {
-                min-height: 80vh;
-                padding: 80px 8%;
-            }
-
-            .hero::after {
-                right: -130px;
-            }
-
-            .prestige,
-            .presentation {
-                grid-template-columns: 1fr;
-            }
-
-            .presentation {
-                gap: 35px;
-            }
-
-            .presentation-image {
-                order: 2;
-            }
-        }
-    </style>
+    <meta name="description" content="FAHIMA PORTES, fabricant de portes depuis 2019 : portes standard, doubles portes, portes coupe-feu certifiées et gaines techniques. Plus de 12 000 portes livrées en 2025.">
+    <title data-i18n-title="meta.title">FAHIMA PORTES | Fabricant de portes depuis 2019</title>
+    <meta property="og:title" content="FAHIMA PORTES | L'élégance de la sécurité">
+    <meta property="og:image" content="https://www.fh-portes.com/icon-512.png">
+    <link rel="alternate" hreflang="fr" href="https://www.fh-portes.com/?lang=fr">
+    <link rel="alternate" hreflang="ar" href="https://www.fh-portes.com/?lang=ar">
+    <link rel="alternate" hreflang="en" href="https://www.fh-portes.com/?lang=en">
+    <link rel="icon" href="favicon.ico" sizes="any">
+    <link rel="icon" type="image/png" sizes="48x48" href="favicon-48.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="manifest" href="site.webmanifest">
+    <meta name="theme-color" content="#080808">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/site.css">
+    <script src="assets/i18n.js"></script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"FAHIMA PORTES","url":"https://www.fh-portes.com","logo":"https://www.fh-portes.com/icon-512.png","foundingDate":"2019"}</script>
+    <link rel="stylesheet" href="assets/accueil.css">
 </head>
-
 <body>
-
-    <header>
-        <nav>
-            <a class="logo" href="index.html">
-                <img src="logo-fahima.png" alt="Logo Fahima">
-                <span>FAHIMA PORTES</span>
-            </a>
-
-            <div class="navigation">
-                <a href="#maison">Notre maison</a>
-                <a class="catalogue-link" href="catalogue.html">
-                    Voir le catalogue
+    <header class="site-header transparent">
+        <div class="topbar">
+            <span class="tagline" data-i18n="top.tagline">Fabricant de portes depuis 2019</span>
+            <div class="topbar-tools">
+                <div class="flags"><span class="flag" data-i18n-attr="title:flag.dz;aria-label:flag.dz" role="img"><svg viewBox="0 0 900 600" aria-hidden="true"><rect width="450" height="600" fill="#006233"/><rect x="450" width="450" height="600" fill="#fff"/><mask id="mdzh"><rect width="900" height="600" fill="#fff"/><circle cx="487.5" cy="300" r="120" fill="#000"/></mask><circle cx="450" cy="300" r="150" fill="#d21034" mask="url(#mdzh)"/><polygon fill="#d21034" points="450.0,300.0 501.8,283.2 501.8,228.7 533.9,272.8 585.7,255.9 553.6,300.0 585.7,344.1 533.9,327.2 501.8,371.3 501.8,316.8"/></svg></span><span class="flag" data-i18n-attr="title:flag.tr;aria-label:flag.tr" role="img"><svg viewBox="0 0 900 600" aria-hidden="true"><rect width="900" height="600" fill="#e30a17"/><mask id="mtrh"><rect width="900" height="600" fill="#fff"/><circle cx="337.5" cy="300" r="120" fill="#000"/></mask><circle cx="300" cy="300" r="150" fill="#fff" mask="url(#mtrh)"/><polygon fill="#fff" points="425.0,300.0 476.8,283.2 476.8,228.7 508.9,272.8 560.7,255.9 528.6,300.0 560.7,344.1 508.9,327.2 476.8,371.3 476.8,316.8"/></svg></span></div>
+                <div class="switch" role="group" data-i18n-attr="aria-label:top.lang">
+                    <button type="button" data-lang="fr" lang="fr">FR</button>
+                    <button type="button" data-lang="ar" lang="ar">عربي</button>
+                    <button type="button" data-lang="en" lang="en">EN</button>
+                </div>
+                <div class="switch" role="group" data-i18n-attr="aria-label:top.currency">
+                    <button type="button" data-cur="DZD">DZD</button>
+                    <button type="button" data-cur="EUR">€</button>
+                </div>
+            </div>
+        </div>
+        <nav class="mainnav">
+            <div class="brand-group">
+                <a class="logo-btn" href="compte.html" data-i18n-attr="title:nav.account;aria-label:nav.account">
+                    <img src="logo-fahima.png" alt="FAHIMA" width="62" height="62">
+                    <span class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg></span>
                 </a>
+                <a class="brand" href="index.html">FAHIMA PORTES</a>
+            </div>
+            <div class="navigation">
+                <a class="hide-sm" href="#usine" data-i18n="nav.factory">Notre usine</a>
+                <a class="hide-sm" href="#gammes" data-i18n="nav.ranges">Nos gammes</a>
+                <a class="hide-sm" href="#contact" data-i18n="nav.contact">Contact</a>
+                <a class="catalogue-link" href="catalogue.html" data-i18n="nav.catalogue">Voir le catalogue</a>
+                <a class="account-link" href="compte.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span data-account-label>Se connecter</span></a>
             </div>
         </nav>
     </header>
@@ -353,83 +63,184 @@
         <section class="hero">
             <div class="hero-content">
                 <span class="ligne-or"></span>
-
-                <div class="sur-titre">
-                    Portes blindées haut de gamme
-                </div>
-
-                <h1>
-                    L'élégance de la sécurité,
-                    <span>la force du prestige.</span>
-                </h1>
-
-                <p class="hero-description">
-                    Bienvenue chez FAHIMA PORTES, spécialiste des portes blindées
-                    luxueuses. Des créations uniques qui associent protection,
-                    raffinement et design contemporain.
-                </p>
-
+                <div class="sur-titre" data-i18n="hero.kicker">Fabricant de portes depuis 2019</div>
+                <h1><span data-i18n="hero.title1">L'élégance de la sécurité,</span> <em data-i18n="hero.title2">la force du prestige.</em></h1>
+                <p class="hero-description" data-i18n="hero.text"></p>
                 <div class="actions">
-                    <a class="bouton-or" href="catalogue.html">
-                        Découvrir nos créations
-                    </a>
-
-                    <a class="bouton-simple" href="#maison">
-                        En savoir plus
-                    </a>
+                    <a class="bouton-or" href="catalogue.html" data-i18n="hero.cta">Découvrir nos créations</a>
+                    <a class="bouton-simple" href="#usine" data-i18n="hero.more">Notre histoire</a>
                 </div>
+            </div>
+            <div class="hero-badge" aria-hidden="false">
+                <strong>+<span data-num="12000">12 000</span></strong>
+                <span data-i18n="hero.badge">portes livrées en 2025</span>
             </div>
         </section>
 
         <section class="prestige">
-            <article class="prestige-item">
-                <span class="icone">◈</span>
-                <h2>Sécurité absolue</h2>
-                <p>Des structures renforcées pour protéger ce qui compte le plus.</p>
-            </article>
+            <article class="prestige-item"><span class="icone">◈</span><h2 data-i18n="values.v1.h"></h2><p data-i18n="values.v1.p"></p></article>
+            <article class="prestige-item"><span class="icone">✦</span><h2 data-i18n="values.v2.h"></h2><p data-i18n="values.v2.p"></p></article>
+            <article class="prestige-item"><span class="icone">♢</span><h2 data-i18n="values.v3.h"></h2><p data-i18n="values.v3.p"></p></article>
+        </section>
 
-            <article class="prestige-item">
-                <span class="icone">✦</span>
-                <h2>Design exclusif</h2>
-                <p>Des modèles raffinés pensés pour sublimer votre entrée.</p>
-            </article>
+        <section class="chiffres" aria-labelledby="chiffres-titre">
+            <h2 id="chiffres-titre" class="visually-hidden" data-i18n="stats.title"></h2>
+            <div class="chiffre"><strong>2019</strong><span data-i18n="stats.s1.t"></span></div>
+            <div class="chiffre"><strong>≈ <span data-num="3000">3 000</span></strong><span data-i18n="stats.s2.t"></span></div>
+            <div class="chiffre"><strong>≈ <span data-num="12000">12 000</span></strong><span data-i18n="stats.s3.t"></span></div>
+            <div class="chiffre objectif"><strong>≈ <span data-num="30000">30 000</span></strong><span data-i18n="stats.s4.t"></span></div>
+        </section>
 
-            <article class="prestige-item">
-                <span class="icone">♢</span>
-                <h2>Finitions premium</h2>
-                <p>Des matériaux et des détails sélectionnés avec exigence.</p>
-            </article>
+        <section class="usine" id="usine">
+            <div class="usine-texte">
+                <div class="petit-titre" data-i18n="factory.kicker">Notre usine</div>
+                <h2 data-i18n="factory.title"></h2>
+                <p class="usine-intro" data-i18n="factory.intro"></p>
+                <ol class="frise">
+                    <li><span class="annee" data-i18n="factory.t1.y">2019</span><div><h3 data-i18n="factory.t1.h"></h3><p data-i18n="factory.t1.p"></p></div></li>
+                    <li><span class="annee" data-i18n="factory.t2.y">2025</span><div><h3 data-i18n="factory.t2.h"></h3><p data-i18n="factory.t2.p"></p></div></li>
+                    <li class="futur"><span class="annee" data-i18n="factory.t3.y">Demain</span><div><h3 data-i18n="factory.t3.h"></h3><p data-i18n="factory.t3.p"></p></div></li>
+                </ol>
+            </div>
+            <div class="usine-visuel">
+                <img src="usine.webp" alt="Porte blindée FAHIMA effet bois et gris anthracite" width="1072" height="1072" loading="lazy">
+                <div class="jauge" aria-hidden="true">
+                    <div class="barre"><i style="width:10%"></i><b>2019</b><span data-num="3000">3 000</span></div>
+                    <div class="barre"><i style="width:40%"></i><b>2025</b><span data-num="12000">12 000</span></div>
+                    <div class="barre cible"><i style="width:100%"></i><b data-i18n="factory.t3.y">Demain</b><span data-num="30000">30 000</span></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="gammes" id="gammes">
+            <div class="entete-section">
+                <div class="petit-titre" data-i18n="ranges.kicker">Nos gammes</div>
+                <h2 data-i18n="ranges.title"></h2>
+            </div>
+            <div class="gammes-grille">
+                <article class="gamme"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><rect x="13" y="5" width="22" height="38"/><circle cx="30" cy="25" r="1.6" fill="currentColor"/><path d="M7 43h34"/></svg><h3 data-i18n="ranges.r1.h"></h3><p data-i18n="ranges.r1.p"></p></article>
+                <article class="gamme"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="5" width="18" height="38"/><rect x="24" y="5" width="18" height="38"/><path d="M20 24v3M28 24v3M3 43h42"/></svg><h3 data-i18n="ranges.r2.h"></h3><p data-i18n="ranges.r2.p"></p></article>
+                <article class="gamme"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><rect x="11" y="5" width="26" height="38"/><path d="M24 33c-4 0-6-3-6-6 0-4 4-6 4-10 3 2 4 4 4 6 1-1 2-2 2-4 2 2 2 5 2 8 0 3-2 6-6 6z"/></svg><span class="etiquette" data-i18n="ranges.r3.tag">Certifiées</span><h3 data-i18n="ranges.r3.h"></h3><p data-i18n="ranges.r3.p"></p></article>
+                <article class="gamme"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="5" width="32" height="38"/><path d="M8 17h32M8 29h32M18 5v38M30 5v38"/><circle cx="35" cy="35" r="1.4" fill="currentColor"/></svg><h3 data-i18n="ranges.r4.h"></h3><p data-i18n="ranges.r4.p"></p></article>
+            </div>
         </section>
 
         <section class="presentation" id="maison">
-            <img
-                class="presentation-image"
-                src="produit-03.png"
-                alt="Porte blindée haut de gamme avec finition bois"
-            >
-
+            <img class="presentation-image" src="produit-03.webp" alt="Porte blindée haut de gamme avec finition bois" width="1024" height="1024" loading="lazy">
             <div>
-                <div class="petit-titre">L'excellence FAHIMA</div>
-
-                <h2>Une entrée qui reflète votre personnalité.</h2>
-
-                <p>
-                    Chaque porte FAHIMA est conçue comme une pièce maîtresse.
-                    Nous croyons qu'une porte blindée ne doit pas seulement
-                    protéger votre maison : elle doit aussi exprimer votre goût,
-                    votre élégance et votre exigence.
-                </p>
-
-                <a class="bouton-or" href="catalogue.html">
-                    Explorer le catalogue
-                </a>
+                <div class="petit-titre" data-i18n="house.kicker"></div>
+                <h2 data-i18n="house.title"></h2>
+                <p data-i18n="house.text"></p>
+                <a class="bouton-or" href="catalogue.html" data-i18n="house.cta"></a>
             </div>
+        </section>
+
+        <section class="galerie" id="galerie">
+            <div class="entete-section">
+                <div class="petit-titre" data-i18n="gallery.kicker">Nos réalisations</div>
+                <h2 data-i18n="gallery.title"></h2>
+                <p class="galerie-intro" data-i18n="gallery.text"></p>
+            </div>
+            <div class="galerie-grille">
+                <figure class="realisation"><img src="produit-01.webp" alt="Modèle Géométrique" width="1024" height="1024" loading="lazy"><figcaption data-i18n="gallery.g1"></figcaption></figure>
+                <figure class="realisation"><img src="produit-02.webp" alt="Modèle Diagonale" width="1024" height="1024" loading="lazy"><figcaption data-i18n="gallery.g2"></figcaption></figure>
+                <figure class="realisation"><img src="produit-05.webp" alt="Modèle Signature" width="1024" height="1024" loading="lazy"><figcaption data-i18n="gallery.g3"></figcaption></figure>
+                <figure class="realisation"><img src="produit-08.webp" alt="Modèle Lumière" width="1024" height="1024" loading="lazy"><figcaption data-i18n="gallery.g4"></figcaption></figure>
+                <figure class="realisation"><img src="produit-07.webp" alt="Modèle Prestige" width="1024" height="1024" loading="lazy"><figcaption data-i18n="gallery.g5"></figcaption></figure>
+                <figure class="realisation"><img src="produit-09.webp" alt="Modèle Contraste" width="1024" height="1024" loading="lazy"><figcaption data-i18n="gallery.g6"></figcaption></figure>
+            </div>
+        </section>
+
+        <section class="temoignages" id="temoignages">
+            <div class="entete-section">
+                <div class="petit-titre" data-i18n="testi.kicker">Ils nous font confiance</div>
+                <h2 data-i18n="testi.title"></h2>
+            </div>
+            <div class="temoignages-grille">
+                <article class="temoignage">
+                    <p class="etoiles" aria-hidden="true">★★★★★</p>
+                    <blockquote data-i18n="testi.t1.t"></blockquote>
+                    <footer><strong data-i18n="testi.t1.n"></strong> <span data-i18n="testi.t1.c"></span></footer>
+                </article>
+                <article class="temoignage">
+                    <p class="etoiles" aria-hidden="true">★★★★★</p>
+                    <blockquote data-i18n="testi.t2.t"></blockquote>
+                    <footer><strong data-i18n="testi.t2.n"></strong> <span data-i18n="testi.t2.c"></span></footer>
+                </article>
+                <article class="temoignage">
+                    <p class="etoiles" aria-hidden="true">★★★★★</p>
+                    <blockquote data-i18n="testi.t3.t"></blockquote>
+                    <footer><strong data-i18n="testi.t3.n"></strong> <span data-i18n="testi.t3.c"></span></footer>
+                </article>
+            </div>
+        </section>
+
+        <section class="contact" id="contact">
+            <div class="contact-infos">
+                <div class="petit-titre" data-i18n="contact.kicker">Nous contacter</div>
+                <h2 data-i18n="contact.title"></h2>
+                <p class="contact-texte" data-i18n="contact.text"></p>
+                <dl class="coordonnees">
+                    <div class="coordonnee"><dt data-i18n="contact.address.h"></dt><dd data-i18n="contact.address.v"></dd></div>
+                    <div class="coordonnee"><dt data-i18n="contact.phone.h"></dt><dd><a href="tel:+33784885023" dir="ltr">+33 7 84 88 50 23</a></dd></div>
+                    <div class="coordonnee"><dt data-i18n="contact.whatsapp.h"></dt><dd><a class="lien-whatsapp" data-wa="33784885023" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.4A10 10 0 1 0 12 2Zm0 18.2c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-2.9.8.8-2.8-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.6-6.1c-.3-.1-1.6-.8-1.8-.9-.2-.1-.4-.1-.6.1-.2.3-.6.9-.8 1.1-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4 0-.5.1-.7l.4-.5c.1-.2.2-.3.3-.5v-.4c0-.1-.6-1.4-.8-1.9-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 1.7 2.7 4.2 3.7.6.3 1 .4 1.4.5.6.2 1.1.2 1.5.1.5 0 1.6-.6 1.8-1.3.2-.6.2-1.1.2-1.2l-.4-.3Z"/></svg><span data-i18n="contact.whatsapp.b"></span></a></dd></div>
+                    <div class="coordonnee"><dt data-i18n="contact.email.h"></dt><dd><a href="mailto:islamefh2@gmail.com" dir="ltr">islamefh2@gmail.com</a></dd></div>
+                    <div class="coordonnee"><dt data-i18n="contact.hours.h"></dt><dd data-i18n="contact.hours.v"></dd></div>
+                </dl>
+            </div>
+            <div class="contact-carte">
+                <iframe src="https://maps.google.com/maps?q=Khelil%2C%20Bordj%20Bou%20Arr%C3%A9ridj%2C%20Alg%C3%A9rie&z=12&output=embed" loading="lazy" data-i18n-attr="title:contact.map" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+        </section>
+
+        <section class="compte-cta">
+            <a class="compte-logo" href="compte.html" data-i18n-attr="aria-label:nav.account"><img src="logo-fahima.png" alt="" width="96" height="96"></a>
+            <div>
+                <h2 data-i18n="account.cta.h"></h2>
+                <p data-i18n="account.cta.p"></p>
+            </div>
+            <a class="bouton-or" href="compte.html#inscription" data-i18n="account.cta.b"></a>
         </section>
     </main>
 
-    <footer>
-        &copy; 2026 FAHIMA PORTES - L'élégance de la sécurité.
+    <footer class="site-footer">
+        <img src="logo-fahima.png" alt="FAHIMA" width="54" height="54">
+        <p>&copy; 2026 <span data-i18n="footer.text">FAHIMA PORTES</span></p>
+        <p class="rate" data-rate></p>
+        <div class="flags"><span class="flag" data-i18n-attr="title:flag.dz;aria-label:flag.dz" role="img"><svg viewBox="0 0 900 600" aria-hidden="true"><rect width="450" height="600" fill="#006233"/><rect x="450" width="450" height="600" fill="#fff"/><mask id="mdzf"><rect width="900" height="600" fill="#fff"/><circle cx="487.5" cy="300" r="120" fill="#000"/></mask><circle cx="450" cy="300" r="150" fill="#d21034" mask="url(#mdzf)"/><polygon fill="#d21034" points="450.0,300.0 501.8,283.2 501.8,228.7 533.9,272.8 585.7,255.9 553.6,300.0 585.7,344.1 533.9,327.2 501.8,371.3 501.8,316.8"/></svg></span><span class="flag" data-i18n-attr="title:flag.tr;aria-label:flag.tr" role="img"><svg viewBox="0 0 900 600" aria-hidden="true"><rect width="900" height="600" fill="#e30a17"/><mask id="mtrf"><rect width="900" height="600" fill="#fff"/><circle cx="337.5" cy="300" r="120" fill="#000"/></mask><circle cx="300" cy="300" r="150" fill="#fff" mask="url(#mtrf)"/><polygon fill="#fff" points="425.0,300.0 476.8,283.2 476.8,228.7 508.9,272.8 560.7,255.9 528.6,300.0 560.7,344.1 508.9,327.2 476.8,371.3 476.8,316.8"/></svg></span></div>
     </footer>
-
+    <script>
+    /* Visionneuse de la galerie */
+    (function () {
+      var visionneuse = document.createElement("div");
+      visionneuse.className = "visionneuse";
+      visionneuse.setAttribute("role", "dialog");
+      visionneuse.setAttribute("aria-modal", "true");
+      visionneuse.innerHTML = '<button type="button" class="visionneuse-fermer" data-i18n-attr="aria-label:gallery.close">&times;</button><img alt="">';
+      document.body.appendChild(visionneuse);
+      var img = visionneuse.querySelector("img");
+      var fig = null;
+      document.querySelectorAll(".galerie-grille .realisation").forEach(function (f) {
+        f.setAttribute("tabindex", "0");
+        f.setAttribute("role", "button");
+        f.setAttribute("data-i18n-attr", "aria-label:gallery.open");
+        f.addEventListener("click", function () { ouvrir(f); });
+        f.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); ouvrir(f); } });
+      });
+      function ouvrir(f) {
+        fig = f;
+        var source = f.querySelector("img");
+        img.src = source.src;
+        img.alt = source.alt;
+        visionneuse.classList.add("active");
+        visionneuse.querySelector(".visionneuse-fermer").focus();
+      }
+      function fermer() { visionneuse.classList.remove("active"); if (fig) fig.focus(); }
+      visionneuse.addEventListener("click", function (e) { if (e.target === visionneuse) fermer(); });
+      visionneuse.querySelector(".visionneuse-fermer").addEventListener("click", fermer);
+      document.addEventListener("keydown", function (e) { if (e.key === "Escape") fermer(); });
+    })();
+    </script>
+    <a class="wa-float" data-wa="33784885023" target="_blank" rel="noopener" aria-label="WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.4A10 10 0 1 0 12 2Zm0 18.2c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-2.9.8.8-2.8-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.6-6.1c-.3-.1-1.6-.8-1.8-.9-.2-.1-.4-.1-.6.1-.2.3-.6.9-.8 1.1-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4 0-.5.1-.7l.4-.5c.1-.2.2-.3.3-.5v-.4c0-.1-.6-1.4-.8-1.9-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 1.7 2.7 4.2 3.7.6.3 1 .4 1.4.5.6.2 1.1.2 1.5.1.5 0 1.6-.6 1.8-1.3.2-.6.2-1.1.2-1.2l-.4-.3Z"/></svg></a>
 </body>
 </html>

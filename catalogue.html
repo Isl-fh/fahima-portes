@@ -3,850 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FAHIMA PORTES | Catalogue</title>
-
-    <style>
-        :root {
-            --noir: #080808;
-            --noir-clair: #151515;
-            --or: #c9a24d;
-            --or-clair: #f2d58a;
-            --fond: #f5f0e7;
-            --blanc: #ffffff;
-            --texte: #3d3a34;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            color: var(--texte);
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            background: var(--fond);
-        }
-
-        header {
-            padding: 15px 7%;
-            background: var(--noir);
-            border-bottom: 1px solid var(--or);
-        }
-
-        nav {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 20px;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: var(--or-clair);
-            font-family: Georgia, serif;
-            font-size: 20px;
-            font-weight: bold;
-            text-decoration: none;
-        }
-
-        .logo img {
-            width: 58px;
-            height: 58px;
-            object-fit: contain;
-            background: white;
-            border: 2px solid var(--or);
-            border-radius: 50%;
-        }
-
-        .retour {
-            color: var(--or-clair);
-            text-decoration: none;
-        }
-
-        .retour:hover {
-            color: white;
-        }
-
-        .intro {
-            padding: 65px 20px 75px;
-            color: white;
-            background: var(--noir);
-            text-align: center;
-        }
-
-        .intro small {
-            color: var(--or-clair);
-            font-size: 12px;
-            font-weight: bold;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-        }
-
-        .intro h1 {
-            margin: 15px 0;
-            font-family: Georgia, serif;
-            font-size: clamp(40px, 6vw, 70px);
-            font-weight: normal;
-        }
-
-        .intro h1 span {
-            color: var(--or-clair);
-            font-style: italic;
-        }
-
-        .intro p {
-            max-width: 680px;
-            margin: auto;
-            color: #d6d1c7;
-        }
-
-        .filtres {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr 1fr;
-            gap: 15px;
-            position: relative;
-            width: 86%;
-            max-width: 1150px;
-            margin: -30px auto 0;
-            padding: 25px;
-            background: var(--noir-clair);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, .2);
-        }
-
-        label {
-            display: block;
-            margin-bottom: 6px;
-            color: var(--or-clair);
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        input,
-        select,
-        textarea {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #d7c8a4;
-            border-radius: 3px;
-            color: var(--texte);
-            background: white;
-        }
-
-        .catalogue {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 25px;
-            max-width: 1250px;
-            margin: auto;
-            padding: 50px 25px 75px;
-        }
-
-        .porte {
-            overflow: hidden;
-            background: var(--blanc);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, .13);
-        }
-
-        .porte img {
-            display: block;
-            width: 100%;
-            height: 340px;
-            object-fit: cover;
-        }
-
-        .informations {
-            padding: 22px;
-        }
-
-        .informations h2 {
-            color: var(--noir);
-            font-family: Georgia, serif;
-            font-size: 23px;
-            font-weight: normal;
-        }
-
-        .type {
-            margin: 5px 0 10px;
-            color: #80632b;
-            font-size: 12px;
-            font-weight: bold;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-
-        .description {
-            min-height: 75px;
-        }
-
-        .prix {
-            margin: 14px 0;
-            color: #9b7222;
-            font-family: Georgia, serif;
-            font-size: 22px;
-            font-weight: bold;
-        }
-
-        .details {
-            min-height: 100px;
-            margin-bottom: 18px;
-            list-style: none;
-        }
-
-        .details li::before {
-            content: "✦ ";
-            color: var(--or);
-        }
-
-        .devis,
-        .envoyer {
-            padding: 12px 18px;
-            border: 0;
-            color: var(--or-clair);
-            background: var(--noir);
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        .devis:hover,
-        .envoyer:hover {
-            color: var(--noir);
-            background: var(--or);
-        }
-
-        .aucun-resultat {
-            display: none;
-            grid-column: 1 / -1;
-            padding: 40px;
-            text-align: center;
-        }
-
-        .contact {
-            padding: 50px 20px;
-            color: white;
-            background: var(--noir);
-            text-align: center;
-        }
-
-        .contact h2 {
-            margin-bottom: 10px;
-            color: var(--or-clair);
-            font-family: Georgia, serif;
-            font-weight: normal;
-        }
-
-        .contact a {
-            color: var(--or-clair);
-        }
-
-        footer {
-            padding: 22px;
-            color: #aaa;
-            background: #050505;
-            text-align: center;
-        }
-
-        .fenetre {
-            display: none;
-            align-items: center;
-            justify-content: center;
-            position: fixed;
-            inset: 0;
-            z-index: 20;
-            padding: 20px;
-            background: rgba(0, 0, 0, .8);
-        }
-
-        .fenetre.active {
-            display: flex;
-        }
-
-        .formulaire {
-            position: relative;
-            width: 100%;
-            max-width: 580px;
-            max-height: 92vh;
-            overflow-y: auto;
-            padding: 30px;
-            background: var(--fond);
-        }
-
-        .formulaire h2 {
-            color: var(--noir);
-            font-family: Georgia, serif;
-            font-weight: normal;
-        }
-
-        .formulaire p {
-            margin-bottom: 18px;
-            font-size: 14px;
-        }
-
-        .fermer {
-            position: absolute;
-            top: 8px;
-            right: 15px;
-            border: 0;
-            color: var(--noir);
-            background: transparent;
-            cursor: pointer;
-            font-size: 28px;
-        }
-
-        .champ {
-            margin-bottom: 13px;
-        }
-
-        .deux-champs {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
-        textarea {
-            min-height: 100px;
-            resize: vertical;
-        }
-
-        .envoyer {
-            width: 100%;
-            margin-top: 8px;
-        }
-
-        .note {
-            margin-top: 10px;
-            color: #665d4c;
-            font-size: 12px;
-        }
-
-        @media (max-width: 950px) {
-            .filtres {
-                grid-template-columns: 1fr 1fr;
-            }
-
-            .catalogue {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 650px) {
-            nav {
-                align-items: flex-start;
-                flex-direction: column;
-            }
-
-            .filtres,
-            .deux-champs {
-                grid-template-columns: 1fr;
-            }
-
-            .catalogue {
-                grid-template-columns: 1fr;
-                padding-right: 7%;
-                padding-left: 7%;
-            }
-        }
-    </style>
+    <meta name="description" content="Catalogue FAHIMA PORTES : portes blindées, doubles portes, portes de chambre et sanitaires. Prix en dinars algériens ou en euros.">
+    <title data-i18n-title="cat.title">FAHIMA PORTES | Catalogue</title>
+    <link rel="icon" href="favicon.ico" sizes="any">
+    <link rel="icon" type="image/png" sizes="48x48" href="favicon-48.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="manifest" href="site.webmanifest">
+    <meta name="theme-color" content="#080808">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/site.css">
+    <script src="assets/i18n.js"></script>
+    <link rel="stylesheet" href="assets/catalogue.css">
 </head>
-
 <body>
-
-    <header>
-        <nav>
-            <a class="logo" href="index.html">
-                <img src="logo-fahima.png" alt="Logo Fahima">
-                <span>FAHIMA PORTES</span>
-            </a>
-
-            <a class="retour" href="index.html">
-                Retour à l'accueil
-            </a>
+    <header class="site-header">
+        <div class="topbar">
+            <span class="tagline" data-i18n="top.tagline">Fabricant de portes depuis 2019</span>
+            <div class="topbar-tools">
+                <div class="flags"><span class="flag" data-i18n-attr="title:flag.dz;aria-label:flag.dz" role="img"><svg viewBox="0 0 900 600" aria-hidden="true"><rect width="450" height="600" fill="#006233"/><rect x="450" width="450" height="600" fill="#fff"/><mask id="mdzh"><rect width="900" height="600" fill="#fff"/><circle cx="487.5" cy="300" r="120" fill="#000"/></mask><circle cx="450" cy="300" r="150" fill="#d21034" mask="url(#mdzh)"/><polygon fill="#d21034" points="450.0,300.0 501.8,283.2 501.8,228.7 533.9,272.8 585.7,255.9 553.6,300.0 585.7,344.1 533.9,327.2 501.8,371.3 501.8,316.8"/></svg></span><span class="flag" data-i18n-attr="title:flag.tr;aria-label:flag.tr" role="img"><svg viewBox="0 0 900 600" aria-hidden="true"><rect width="900" height="600" fill="#e30a17"/><mask id="mtrh"><rect width="900" height="600" fill="#fff"/><circle cx="337.5" cy="300" r="120" fill="#000"/></mask><circle cx="300" cy="300" r="150" fill="#fff" mask="url(#mtrh)"/><polygon fill="#fff" points="425.0,300.0 476.8,283.2 476.8,228.7 508.9,272.8 560.7,255.9 528.6,300.0 560.7,344.1 508.9,327.2 476.8,371.3 476.8,316.8"/></svg></span></div>
+                <div class="switch" role="group" data-i18n-attr="aria-label:top.lang">
+                    <button type="button" data-lang="fr" lang="fr">FR</button>
+                    <button type="button" data-lang="ar" lang="ar">عربي</button>
+                    <button type="button" data-lang="en" lang="en">EN</button>
+                </div>
+                <div class="switch" role="group" data-i18n-attr="aria-label:top.currency">
+                    <button type="button" data-cur="DZD">DZD</button>
+                    <button type="button" data-cur="EUR">€</button>
+                </div>
+            </div>
+        </div>
+        <nav class="mainnav">
+            <div class="brand-group">
+                <a class="logo-btn" href="compte.html" data-i18n-attr="title:nav.account;aria-label:nav.account">
+                    <img src="logo-fahima.png" alt="FAHIMA" width="62" height="62">
+                    <span class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg></span>
+                </a>
+                <a class="brand" href="index.html">FAHIMA PORTES</a>
+            </div>
+            <div class="navigation">
+                <a class="hide-sm" href="index.html" data-i18n="nav.home">Accueil</a>
+                <a class="account-link" href="compte.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span data-account-label>Se connecter</span></a>
+            </div>
         </nav>
     </header>
 
     <main>
         <section class="intro">
-            <small>Collection privée 2026</small>
-
-            <h1>Le catalogue <span>FAHIMA</span></h1>
-
-            <p>
-                Découvrez nos portes de caractère, conçues pour associer
-                sécurité, raffinement et personnalité.
-            </p>
+            <small data-i18n="cat.kicker">Collection 2026</small>
+            <h1><span class="h1a" data-i18n="cat.h1a">Le catalogue</span> <span>FAHIMA</span></h1>
+            <p data-i18n="cat.intro"></p>
         </section>
 
         <section class="filtres">
             <div>
-                <label for="recherche">Rechercher un modèle</label>
-                <input
-                    id="recherche"
-                    type="search"
-                    placeholder="Exemple : prestige, bois..."
-                >
+                <label for="recherche" data-i18n="cat.search">Rechercher un modèle</label>
+                <input id="recherche" type="search" data-i18n-attr="placeholder:cat.search.ph">
             </div>
-
             <div>
-                <label for="categorie">Type de porte</label>
+                <label for="categorie" data-i18n="cat.type">Type de porte</label>
                 <select id="categorie">
-                    <option value="tous">Toutes les portes</option>
-                    <option value="blindee">Porte blindée</option>
-                    <option value="fer-forge">Fer forgé</option>
-                    <option value="simple">Porte simple</option>
-                    <option value="double">Porte double</option>
-                    <option value="chambre">Porte de chambre</option>
-                    <option value="sanitaire">Porte sanitaire</option>
+                    <option value="tous" data-i18n="cat.all">Toutes les portes</option>
+                    <option value="blindee" data-i18n="type.blindee">Porte blindée</option>
+                    <option value="fer-forge" data-i18n="type.fer-forge">Fer forgé</option>
+                    <option value="simple" data-i18n="type.simple">Porte simple</option>
+                    <option value="double" data-i18n="type.double">Porte double</option>
+                    <option value="chambre" data-i18n="type.chambre">Porte de chambre</option>
+                    <option value="salon" data-i18n="type.salon">Porte de salon</option>
                 </select>
             </div>
-
             <div>
-                <label for="prix-min">Prix minimum (€)</label>
-                <input
-                    id="prix-min"
-                    type="number"
-                    min="899.99"
-                    max="8799.99"
-                    step="0.01"
-                    placeholder="899.99"
-                >
+                <label for="prix-min"><span data-i18n="cat.min">Prix minimum</span> (<span class="sym"></span>)</label>
+                <input id="prix-min" type="number" min="0" inputmode="decimal">
             </div>
-
             <div>
-                <label for="prix-max">Prix maximum (€)</label>
-                <input
-                    id="prix-max"
-                    type="number"
-                    min="899.99"
-                    max="8799.99"
-                    step="0.01"
-                    placeholder="8799.99"
-                >
+                <label for="prix-max"><span data-i18n="cat.max">Prix maximum</span> (<span class="sym"></span>)</label>
+                <input id="prix-max" type="number" min="0" inputmode="decimal">
             </div>
         </section>
 
-        <section class="catalogue">
-
-            <article
-                class="porte"
-                data-nom="geometrique"
-                data-type="blindee fer-forge simple"
-                data-prix="4599.99"
-            >
-                <img src="produit-01.png" alt="Porte blindée noire géométrique">
-
-                <div class="informations">
-                    <h2>Modèle Géométrique</h2>
-                    <p class="type">Porte blindée - Fer forgé - Simple</p>
-                    <p class="description">
-                        Un décor géométrique travaillé pour une entrée moderne et sécurisée.
-                    </p>
-                    <p class="prix">4 599,99 €</p>
-
-                    <ul class="details">
-                        <li>Serrure multipoints</li>
-                        <li>Structure renforcée</li>
-                        <li>Finition noire premium</li>
-                    </ul>
-
-                    <button class="devis" data-produit="Modèle Géométrique">
-                        Demander un devis
-                    </button>
-                </div>
-            </article>
-
-            <article
-                class="porte"
-                data-nom="horizon"
-                data-type="blindee simple"
-                data-prix="5299.99"
-            >
-                <img src="produit-02.png" alt="Porte blindée grise Horizon">
-
-                <div class="informations">
-                    <h2>Modèle Horizon</h2>
-                    <p class="type">Porte blindée - Simple</p>
-                    <p class="description">
-                        Une finition grise élégante avec des lignes horizontales.
-                    </p>
-                    <p class="prix">5 299,99 €</p>
-
-                    <ul class="details">
-                        <li>Blindage renforcé</li>
-                        <li>Poignée longue</li>
-                        <li>Isolation renforcée</li>
-                    </ul>
-
-                    <button class="devis" data-produit="Modèle Horizon">
-                        Demander un devis
-                    </button>
-                </div>
-            </article>
-
-            <article
-                class="porte"
-                data-nom="diagonale"
-                data-type="blindee simple"
-                data-prix="3899.99"
-            >
-                <img src="produit-03.png" alt="Porte blindée Diagonale">
-
-                <div class="informations">
-                    <h2>Modèle Diagonale</h2>
-                    <p class="type">Porte blindée - Simple</p>
-                    <p class="description">
-                        Une finition effet bois avec des lignes diagonales.
-                    </p>
-                    <p class="prix">3 899,99 €</p>
-
-                    <ul class="details">
-                        <li>Blindage renforcé</li>
-                        <li>Finition effet bois</li>
-                        <li>Pose sur devis</li>
-                    </ul>
-
-                    <button class="devis" data-produit="Modèle Diagonale">
-                        Demander un devis
-                    </button>
-                </div>
-            </article>
-
-            <article
-                class="porte"
-                data-nom="lumiere chambre"
-                data-type="chambre simple"
-                data-prix="1899.99"
-            >
-                <img src="produit-04.png" alt="Porte claire de chambre">
-
-                <div class="informations">
-                    <h2>Modèle Lumière</h2>
-                    <p class="type">Porte de chambre - Simple</p>
-                    <p class="description">
-                        Une porte claire et lumineuse avec un insert décoratif.
-                    </p>
-                    <p class="prix">1 899,99 €</p>
-
-                    <ul class="details">
-                        <li>Design élégant</li>
-                        <li>Finition claire</li>
-                        <li>Pose sur devis</li>
-                    </ul>
-
-                    <button class="devis" data-produit="Modèle Lumière">
-                        Demander un devis
-                    </button>
-                </div>
-            </article>
-
-            <article
-                class="porte"
-                data-nom="signature"
-                data-type="blindee simple"
-                data-prix="5799.99"
-            >
-                <img src="produit-05.png" alt="Porte blindée Signature">
-
-                <div class="informations">
-                    <h2>Modèle Signature</h2>
-                    <p class="type">Porte blindée - Simple</p>
-                    <p class="description">
-                        Une porte effet bois avec un panneau central premium.
-                    </p>
-                    <p class="prix">5 799,99 €</p>
-
-                    <ul class="details">
-                        <li>Blindage haute résistance</li>
-                        <li>Finition personnalisable</li>
-                        <li>Serrure sécurisée</li>
-                    </ul>
-
-                    <button class="devis" data-produit="Modèle Signature">
-                        Demander un devis
-                    </button>
-                </div>
-            </article>
-
-            <article
-                class="porte"
-                data-nom="double"
-                data-type="blindee double fer-forge"
-                data-prix="8799.99"
-            >
-                <img src="produit-06.png" alt="Porte blindée double">
-
-                <div class="informations">
-                    <h2>Modèle Double</h2>
-                    <p class="type">Porte blindée - Double - Fer forgé</p>
-                    <p class="description">
-                        Une grande porte double vantail pour les entrées prestigieuses.
-                    </p>
-                    <p class="prix">8 799,99 €</p>
-
-                    <ul class="details">
-                        <li>Double vantail</li>
-                        <li>Poignées ergonomiques</li>
-                        <li>Structure renforcée</li>
-                    </ul>
-
-                    <button class="devis" data-produit="Modèle Double">
-                        Demander un devis
-                    </button>
-                </div>
-            </article>
-
-            <article
-                class="porte"
-                data-nom="contraste"
-                data-type="blindee simple fer-forge"
-                data-prix="6499.99"
-            >
-                <img src="produit-07.png" alt="Porte blindée Contraste">
-
-                <div class="informations">
-                    <h2>Modèle Contraste</h2>
-                    <p class="type">Porte blindée - Simple - Fer forgé</p>
-                    <p class="description">
-                        Un modèle bicolore avec une finition bois sombre.
-                    </p>
-                    <p class="prix">6 499,99 €</p>
-
-                    <ul class="details">
-                        <li>Design bicolore</li>
-                        <li>Serrure sécurisée</li>
-                        <li>Finitions modernes</li>
-                    </ul>
-
-                    <button class="devis" data-produit="Modèle Contraste">
-                        Demander un devis
-                    </button>
-                </div>
-            </article>
-
-            <article
-                class="porte"
-                data-nom="prestige"
-                data-type="double chambre"
-                data-prix="7299.99"
-            >
-                <img src="produit-08.jpg" alt="Porte double Prestige">
-
-                <div class="informations">
-                    <h2>Modèle Prestige</h2>
-                    <p class="type">Porte double - Porte de chambre</p>
-                    <p class="description">
-                        Une porte double effet bois avec vitrages décoratifs.
-                    </p>
-                    <p class="prix">7 299,99 €</p>
-
-                    <ul class="details">
-                        <li>Double vantail</li>
-                        <li>Vitrages décoratifs</li>
-                        <li>Finition bois premium</li>
-                    </ul>
-
-                    <button class="devis" data-produit="Modèle Prestige">
-                        Demander un devis
-                    </button>
-                </div>
-            </article>
-
-            <article
-                class="porte"
-                data-nom="sanitaire"
-                data-type="sanitaire simple"
-                data-prix="899.99"
-            >
-                <img src="produit-04.png" alt="Porte sanitaire">
-
-                <div class="informations">
-                    <h2>Modèle Sanitaire</h2>
-                    <p class="type">Porte sanitaire - Simple</p>
-                    <p class="description">
-                        Une solution claire et pratique pour les espaces sanitaires.
-                    </p>
-                    <p class="prix">899,99 €</p>
-
-                    <ul class="details">
-                        <li>Entretien facile</li>
-                        <li>Finition résistante</li>
-                        <li>Pose sur devis</li>
-                    </ul>
-
-                    <button class="devis" data-produit="Modèle Sanitaire">
-                        Demander un devis
-                    </button>
-                </div>
-            </article>
-
-            <p class="aucun-resultat" id="aucun-resultat">
-                Aucun modèle ne correspond à votre recherche.
-            </p>
+        <section class="catalogue" id="catalogue" aria-live="polite">
+            <p class="aucun-resultat" id="catalogue-info"></p>
+            <p class="aucun-resultat" id="aucun-resultat" data-i18n="cat.none"></p>
         </section>
 
         <section class="contact">
-            <h2>Une question ou un projet sur mesure ?</h2>
+            <h2 data-i18n="cat.contact.h"></h2>
             <p>
-                Appelez le
-                <a href="tel:+33784885023">+33 7 84 88 50 23</a>
-                ou écrivez à
-                <a href="mailto:islamefh2@gmail.com">
-                    islamefh2@gmail.com
-                </a>
+                <span data-i18n="cat.contact.call">Appelez le</span>
+                <a href="tel:+33784885023" dir="ltr">+33 7 84 88 50 23</a>
+                <span data-i18n="cat.contact.or">ou écrivez à</span>
+                <a href="mailto:islamefh2@gmail.com" dir="ltr">islamefh2@gmail.com</a>
+            </p>
+            <p class="contact-whatsapp">
+                <a class="lien-whatsapp" data-wa="33784885023" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.4A10 10 0 1 0 12 2Zm0 18.2c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-2.9.8.8-2.8-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.6-6.1c-.3-.1-1.6-.8-1.8-.9-.2-.1-.4-.1-.6.1-.2.3-.6.9-.8 1.1-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4 0-.5.1-.7l.4-.5c.1-.2.2-.3.3-.5v-.4c0-.1-.6-1.4-.8-1.9-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 1.7 2.7 4.2 3.7.6.3 1 .4 1.4.5.6.2 1.1.2 1.5.1.5 0 1.6-.6 1.8-1.3.2-.6.2-1.1.2-1.2l-.4-.3Z"/></svg><span data-i18n="contact.whatsapp.b"></span></a>
             </p>
         </section>
     </main>
 
-    <div class="fenetre" id="fenetre">
+    <div class="fenetre" id="fenetre" role="dialog" aria-modal="true" aria-labelledby="form-titre">
         <form class="formulaire" id="formulaire">
-            <button class="fermer" id="fermer" type="button">&times;</button>
-
-            <h2>Demander un devis</h2>
-
-            <p>
-                Remplissez vos coordonnées. Votre logiciel e-mail préparera
-                automatiquement le message.
-            </p>
-
-            <div class="champ">
-                <label for="produit">Modèle choisi</label>
-                <input id="produit" name="produit" readonly>
-            </div>
-
+            <button class="fermer" id="fermer" type="button" aria-label="×">&times;</button>
+            <h2 id="form-titre" data-i18n="form.h"></h2>
+            <p data-i18n="form.p"></p>
+            <p class="prefill" id="prefill" data-i18n="form.prefill"></p>
+            <div class="champ"><label for="produit" data-i18n="form.model"></label><input id="produit" name="produit" readonly></div>
             <div class="deux-champs">
-                <div class="champ">
-                    <label for="nom">Nom et prénom *</label>
-                    <input id="nom" name="nom" required>
-                </div>
-
-                <div class="champ">
-                    <label for="telephone">Téléphone *</label>
-                    <input id="telephone" name="telephone" type="tel" required>
-                </div>
+                <div class="champ"><label for="nom" data-i18n="form.name"></label><input id="nom" name="nom" autocomplete="name" required></div>
+                <div class="champ"><label for="telephone" data-i18n="form.phone"></label><input id="telephone" name="telephone" type="tel" autocomplete="tel" dir="ltr" required></div>
             </div>
-
-            <div class="champ">
-                <label for="email">Votre e-mail *</label>
-                <input id="email" name="email" type="email" required>
-            </div>
-
-            <div class="champ">
-                <label for="adresse">Adresse du projet</label>
-                <input id="adresse" name="adresse">
-            </div>
-
-            <div class="champ">
-                <label for="message">Votre demande</label>
-                <textarea id="message" name="message"
-                    placeholder="Dimensions, installation, question..."></textarea>
-            </div>
-
-            <button class="envoyer" type="submit">
-                Envoyer la demande par e-mail
-            </button>
-
-            <p class="note">
-                Après validation, cliquez sur « Envoyer » dans votre logiciel e-mail.
-            </p>
+            <div class="champ"><label for="email" data-i18n="form.email"></label><input id="email" name="email" type="email" autocomplete="email" dir="ltr" required></div>
+            <div class="champ"><label for="adresse" data-i18n="form.address"></label><input id="adresse" name="adresse" autocomplete="street-address"></div>
+            <div class="champ"><label for="message" data-i18n="form.msg"></label><textarea id="message" name="message" data-i18n-attr="placeholder:form.msg.ph"></textarea></div>
+            <button class="envoyer" type="submit" data-i18n="form.send"></button>
+            <button class="envoyer wa" type="button" id="envoyer-wa" data-i18n="form.sendwa"></button>
+            <p class="note" data-i18n="form.note"></p>
         </form>
     </div>
 
-    <footer>
-        &copy; 2026 FAHIMA PORTES - L'élégance de la sécurité.
+    <footer class="site-footer">
+        <img src="logo-fahima.png" alt="FAHIMA" width="54" height="54">
+        <p>&copy; 2026 <span data-i18n="footer.text">FAHIMA PORTES</span></p>
+        <p class="rate" data-rate></p>
+        <div class="flags"><span class="flag" data-i18n-attr="title:flag.dz;aria-label:flag.dz" role="img"><svg viewBox="0 0 900 600" aria-hidden="true"><rect width="450" height="600" fill="#006233"/><rect x="450" width="450" height="600" fill="#fff"/><mask id="mdzf"><rect width="900" height="600" fill="#fff"/><circle cx="487.5" cy="300" r="120" fill="#000"/></mask><circle cx="450" cy="300" r="150" fill="#d21034" mask="url(#mdzf)"/><polygon fill="#d21034" points="450.0,300.0 501.8,283.2 501.8,228.7 533.9,272.8 585.7,255.9 553.6,300.0 585.7,344.1 533.9,327.2 501.8,371.3 501.8,316.8"/></svg></span><span class="flag" data-i18n-attr="title:flag.tr;aria-label:flag.tr" role="img"><svg viewBox="0 0 900 600" aria-hidden="true"><rect width="900" height="600" fill="#e30a17"/><mask id="mtrf"><rect width="900" height="600" fill="#fff"/><circle cx="337.5" cy="300" r="120" fill="#000"/></mask><circle cx="300" cy="300" r="150" fill="#fff" mask="url(#mtrf)"/><polygon fill="#fff" points="425.0,300.0 476.8,283.2 476.8,228.7 508.9,272.8 560.7,255.9 528.6,300.0 560.7,344.1 508.9,327.2 476.8,371.3 476.8,316.8"/></svg></span></div>
     </footer>
-
-    <script>
-        const cartes = document.querySelectorAll(".porte");
-        const recherche = document.querySelector("#recherche");
-        const categorie = document.querySelector("#categorie");
-        const prixMin = document.querySelector("#prix-min");
-        const prixMax = document.querySelector("#prix-max");
-        const aucunResultat = document.querySelector("#aucun-resultat");
-
-        function filtrerProduits() {
-            const texte = recherche.value.toLowerCase().trim();
-            const typeChoisi = categorie.value;
-            const minimum = Number(prixMin.value) || 899.99;
-            const maximum = Number(prixMax.value) || 8799.99;
-            let nombreVisible = 0;
-
-            cartes.forEach(function (carte) {
-                const nom = carte.dataset.nom;
-                const types = carte.dataset.type;
-                const prix = Number(carte.dataset.prix);
-
-                const bonNom = nom.includes(texte);
-                const bonType =
-                    typeChoisi === "tous" || types.includes(typeChoisi);
-                const bonPrix = prix >= minimum && prix <= maximum;
-
-                if (bonNom && bonType && bonPrix) {
-                    carte.style.display = "";
-                    nombreVisible++;
-                } else {
-                    carte.style.display = "none";
-                }
-            });
-
-            aucunResultat.style.display =
-                nombreVisible === 0 ? "block" : "none";
-        }
-
-        recherche.addEventListener("input", filtrerProduits);
-        categorie.addEventListener("change", filtrerProduits);
-        prixMin.addEventListener("input", filtrerProduits);
-        prixMax.addEventListener("input", filtrerProduits);
-
-        const fenetre = document.querySelector("#fenetre");
-        const formulaire = document.querySelector("#formulaire");
-        const produit = document.querySelector("#produit");
-
-        document.querySelectorAll(".devis").forEach(function (bouton) {
-            bouton.addEventListener("click", function () {
-                produit.value = bouton.dataset.produit;
-                fenetre.classList.add("active");
-                document.querySelector("#nom").focus();
-            });
-        });
-
-        document.querySelector("#fermer").addEventListener("click", function () {
-            fenetre.classList.remove("active");
-        });
-
-        fenetre.addEventListener("click", function (event) {
-            if (event.target === fenetre) {
-                fenetre.classList.remove("active");
-            }
-        });
-
-        formulaire.addEventListener("submit", function (event) {
-            event.preventDefault();
-
-            const donnees = new FormData(formulaire);
-
-            const sujet = encodeURIComponent(
-                "Demande de devis - " + donnees.get("produit")
-            );
-
-            const message = encodeURIComponent(
-                "Bonjour FAHIMA PORTES,\n\n" +
-                "Je souhaite demander un devis pour : " +
-                donnees.get("produit") + "\n\n" +
-                "Nom et prénom : " + donnees.get("nom") + "\n" +
-                "Téléphone : " + donnees.get("telephone") + "\n" +
-                "E-mail : " + donnees.get("email") + "\n" +
-                "Adresse du projet : " + donnees.get("adresse") + "\n\n" +
-                "Ma demande :\n" + donnees.get("message")
-            );
-
-            window.location.href =
-                "mailto:islamefh2@gmail.com" +
-                "?subject=" + sujet +
-                "&body=" + message;
-        });
-    </script>
-
+    <script type="module" src="assets/catalogue.js"></script>
+    <a class="wa-float" data-wa="33784885023" target="_blank" rel="noopener" aria-label="WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.4A10 10 0 1 0 12 2Zm0 18.2c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-2.9.8.8-2.8-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.6-6.1c-.3-.1-1.6-.8-1.8-.9-.2-.1-.4-.1-.6.1-.2.3-.6.9-.8 1.1-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4 0-.5.1-.7l.4-.5c.1-.2.2-.3.3-.5v-.4c0-.1-.6-1.4-.8-1.9-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 1.7 2.7 4.2 3.7.6.3 1 .4 1.4.5.6.2 1.1.2 1.5.1.5 0 1.6-.6 1.8-1.3.2-.6.2-1.1.2-1.2l-.4-.3Z"/></svg></a>
 </body>
 </html>
