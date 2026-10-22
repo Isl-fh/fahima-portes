@@ -51,11 +51,22 @@ async function gererUtilisateur(u) {
   $("btn-importer").hidden = true;
   if (!u) { montrerVue("vue-connexion"); return; }
   let admin = false;
+  let erreurVerif = null;
+  montrerVue("vue-connexion");
+  infoConnexion("Connecté. Vérification des droits administrateur…", false);
   try {
-    const s = await fstore.getDoc(fstore.doc(db, "admins", u.uid));
+    const s = await Promise.race([
+      fstore.getDoc(fstore.doc(db, "admins", u.uid)),
+      new Promise((_, rej) => setTimeout(() => rej(new Error("délai dépassé (10 s) : la base de données ne répond pas")), 10000))
+    ]);
     admin = s.exists();
-  } catch (e) { admin = false; }
+  } catch (e) { admin = false; erreurVerif = e; }
   if (u !== utilisateur) return; // l'utilisateur a changé pendant la vérification
+  if (erreurVerif) {
+    infoConnexion("Vérification impossible : " + (erreurVerif.code || "") + " " + erreurVerif.message, true);
+    return;
+  }
+  infoConnexion(null);
   if (!admin) { montrerVue("vue-refuse"); return; }
   $("admin-email-affiche").textContent = u.email || u.phoneNumber || "";
   montrerVue("vue-admin");
@@ -66,6 +77,13 @@ function arreterEcouteCatalogue() {
   if (arreterEcoute) { try { arreterEcoute(); } catch (e) {} arreterEcoute = null; }
 }
 
+function infoConnexion(txt, erreur) {
+  const m = $("admin-message");
+  if (!txt) { m.hidden = true; return; }
+  m.textContent = txt;
+  m.hidden = false;
+}
+
 // ---------- Connexion ----------
 $("form-admin-login").addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -73,14 +91,14 @@ $("form-admin-login").addEventListener("submit", async (e) => {
   const email = $("admin-email").value.trim();
   const pw = $("admin-pw").value;
   if (!email || !pw) return;
+  infoConnexion("Connexion en cours…", false);
   try {
-    await fb.setPersistence(auth, fb.browserLocalPersistence);
+    try { await fb.setPersistence(auth, fb.browserLocalPersistence); } catch (e) { console.warn("Persistance indisponible", e); }
     await fb.signInWithEmailAndPassword(auth, email, pw);
     $("admin-pw").value = "";
   } catch (err) {
-    const m = $("admin-message");
-    m.textContent = "Connexion impossible : vérifiez votre e-mail et votre mot de passe.";
-    m.hidden = false;
+    const code = err && err.code ? " (" + err.code + ")" : "";
+    infoConnexion("Connexion impossible : vérifiez votre e-mail et votre mot de passe." + code, true);
   }
 });
 $("btn-admin-logout").addEventListener("click", () => auth && fb.signOut(auth));
