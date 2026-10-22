@@ -197,6 +197,8 @@ $("form-login").addEventListener("submit", async (e) => {
     await persistance();
     const r = await fb.signInWithEmailAndPassword(auth, identifiant, pw);
     message(r.user.phoneNumber || r.user.emailVerified ? null : "err.notverified", null, "info");
+    window.location.href = "index.html";
+    return;
   } catch (err) {
     message(codeErreur(err));
   } finally {
@@ -231,6 +233,8 @@ $("form-signup").addEventListener("submit", async (e) => {
       memoriser(r.user);
       afficherTableau(r.user);
       message("acc.email.sent", { email }, "ok");
+      window.location.href = "index.html";
+      return;
     }
   } catch (err) {
     message(codeErreur(err));
