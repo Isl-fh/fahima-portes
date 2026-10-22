@@ -56,15 +56,14 @@ function majEnTete(user) {
         '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm0 1.5c-4.4 0-8 2.4-8 5.3V20h16v-1.2c0-2.9-3.6-5.3-8-5.3Z"/></svg>';
       a.appendChild(icone);
     }
+    /* Le libellé « Se connecter » est remplacé par l'icône pour tous ;
+       le nom du bouton reste lisible pour les lecteurs d'écran. */
+    if (span) span.hidden = true;
+    a.setAttribute("aria-label", user ? (user.displayName || user.email) : (window.FH ? FH.t("nav.login") : ""));
     if (user) {
       a.classList.add("connecte");
-      if (span) span.hidden = true;
     } else {
       a.classList.remove("connecte");
-      if (span) {
-        span.hidden = false;
-        if (window.FH) span.textContent = FH.t("nav.login");
-      }
     }
   });
 }
@@ -85,7 +84,9 @@ async function demarrer() {
      sinon en mémoire (cadre restreint, navigation privée) — sinon la
      connexion elle-même échoue avec une SecurityError. */
   try {
-    await A.setPersistence(session.auth, stockageLocal ? A.browserLocalPersistence : A.inMemoryPersistence);
+    /* Connexion conservée pendant toute la visite : elle survit aux
+       changements de page et disparaît quand le site est complètement fermé. */
+    await A.setPersistence(session.auth, stockageLocal ? A.browserSessionPersistence : A.inMemoryPersistence);
   } catch (e) { console.warn("Persistance Firebase indisponible", e); }
   session.db = F.getFirestore(app);
   if (window.FH) session.auth.languageCode = FH.etat.lang;
