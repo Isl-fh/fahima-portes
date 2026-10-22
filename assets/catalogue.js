@@ -1,8 +1,8 @@
 /* Catalogue FAHIMA PORTES — produits, filtres, demande de devis,
    favoris et avis clients (notes + commentaires) via Firestore. */
-import { PRODUITS_INITIAUX } from "./produits-initiaux.js?v=20261027";
-import { firebaseConfig } from "./firebase-config.js?v=20261027";
-import { session } from "./session.js?v=20261027";
+import { PRODUITS_INITIAUX } from "./produits-initiaux.js?v=20261028";
+import { firebaseConfig } from "./firebase-config.js?v=20261028";
+import { session } from "./session.js?v=20261028";
 
 (function () {
   // Prix de référence en euros (convertis automatiquement en dinars)
@@ -50,12 +50,14 @@ import { session } from "./session.js?v=20261027";
         '<p class="description">' + esc(x.d) + "</p>" +
         '<p class="prix"><small>' + esc(FH.t("cat.from")) + "</small>" + esc(FH.prix(p.eur)) + "</p>" +
         '<ul class="details">' + x.f.map(function (f) { return "<li>" + esc(f) + "</li>"; }).join("") + "</ul>" +
+        '<button class="commander" type="button">' + esc(FH.t("cmd.btn")) + "</button>" +
         '<button class="devis" type="button">' + esc(FH.t("cat.quote")) + "</button>" +
         "</div>";
       var image = a.querySelector("img");
       image.src = p.img; // affectation directe : jamais insérée dans du HTML
       image.alt = x.n;
       a.querySelector(".devis").addEventListener("click", function () { ouvrir(p); });
+      a.querySelector(".commander").addEventListener("click", function () { ouvrirCommande(p); });
       a.querySelector(".fav-btn").addEventListener("click", function () { basculerFavori(p.id); });
       a.querySelector(".avis-entree").addEventListener("click", function () { ouvrirAvis(p); });
       majFavBouton(a, p.id);
@@ -406,6 +408,77 @@ import { session } from "./session.js?v=20261027";
     window.open("https://wa.me/33784885023?text=" + encodeURIComponent(msg), "_blank", "noopener");
   });
 
+  // ---------- Commander ----------
+  var fenetreCommande = document.getElementById("fenetre-commande");
+  var produitCommande = null;
+
+  function ouvrirCommande(p) {
+    if (!session.user) { window.location.href = "compte.html"; return; }
+    produitCommande = p;
+    var L = FH.etat.lang;
+    document.getElementById("cmd-produit").textContent = (p[L] || p.fr).n;
+    var nom = (session.user.displayName || "");
+    var vraiEmail = session.user.email && session.user.email.indexOf("@tel.") === -1 ? session.user.email : "";
+    document.getElementById("cmd-nom").value = nom;
+    document.getElementById("cmd-email").value = vraiEmail;
+    document.getElementById("cmd-tel").value = session.user.phoneNumber || "";
+    document.getElementById("cmd-adresse").value = "";
+    document.getElementById("cmd-message").value = "";
+    var msg = document.getElementById("cmd-msg");
+    msg.hidden = true;
+    majChampAdresse();
+    fenetreCommande.hidden = false;
+  }
+
+  function majChampAdresse() {
+    var mode = document.querySelector('input[name="cmd-livraison"]:checked');
+    document.getElementById("cmd-adresse-champ").hidden = !mode || mode.value !== "livraison";
+  }
+
+  document.querySelectorAll('input[name="cmd-livraison"]').forEach(function (r) {
+    r.addEventListener("change", majChampAdresse);
+  });
+  document.getElementById("fermer-commande").addEventListener("click", function () { fenetreCommande.hidden = true; });
+
+  document.getElementById("form-commande").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    var F = session.fstore;
+    var msg = document.getElementById("cmd-msg");
+    if (!session.user || !F || !session.db) { msg.hidden = false; msg.textContent = FH.t("cmd.connect"); return; }
+    var nom = document.getElementById("cmd-nom").value.trim();
+    var tel = document.getElementById("cmd-tel").value.trim();
+    var email = document.getElementById("cmd-email").value.trim().toLowerCase();
+    var mode = document.querySelector('input[name="cmd-livraison"]:checked');
+    var typeLivraison = mode ? mode.value : "livraison";
+    var adresse = document.getElementById("cmd-adresse").value.trim();
+    var message = document.getElementById("cmd-message").value.trim();
+    function erreur(txt) { msg.hidden = false; msg.textContent = txt; }
+    if (!nom || !tel || !email) return erreur(FH.t("err.required"));
+    if (email.indexOf("@") < 1) return erreur(FH.t("err.email"));
+    if (typeLivraison === "livraison" && adresse.length < 5) return erreur(FH.t("cmd.adresse.erreur"));
+    if (!produitCommande) return;
+    msg.hidden = true;
+    try {
+      await F.addDoc(F.collection(session.db, "commandes"), {
+        clientEmail: email,
+        clientUid: session.user.uid,
+        nom: nom,
+        telephone: tel,
+        adresse: typeLivraison === "livraison" ? adresse : "",
+        typeLivraison: typeLivraison,
+        produit: produitCommande.fr.n,
+        produitId: produitCommande.id,
+        message: message,
+        statut: "en-attente",
+        date: F.serverTimestamp()
+      });
+      fenetreCommande.hidden = true;
+      alert(FH.t("cmd.ok"));
+    } catch (err) {
+      erreur(FH.t("cmd.err") + (err && err.code ? " (" + err.code + ")" : ""));
+    }
+  });
+
   // Source des offres :
   // - Firebase non configuré : liste d'aperçu statique (aucun admin actif).
   // - Firebase configuré : les offres viennent uniquement de Firestore.
@@ -423,20 +496,6 @@ import { session } from "./session.js?v=20261027";
         var snap = await F.getDocs(F.query(F.collection(session.db, "products"), F.where("visible", "==", true)));
         PRODUITS = snap.docs.map(function (d) { return Object.assign({ id: d.id }, d.data()); })
           .sort(function (a, b) { return (a.ordre || 999) - (b.ordre || 999); });
-        /* APERÇU UNIQUEMENT (site d'aperçu) — renommages appliqués côté navigateur
-           en attendant la mise à jour des documents Firestore (products/double,
-           products/signature, products/prestige). Seuls les libellés et catégories
-           sont remplacés (jamais prix ni photo). À SUPPRIMER une fois ces documents
-           mis à jour dans Firebase. Les données réelles ne sont pas modifiées ici. */
-        if (location.hostname.indexOf("sites.pplx.app") > -1) {
-          PRODUITS.forEach(function (p) {
-            if (p.id === "double" || p.id === "signature" || p.id === "prestige") {
-              PRODUITS_INITIAUX.forEach(function (s) {
-                if (s.id === p.id) { p.types = s.types; p.fr = s.fr; p.ar = s.ar; p.en = s.en; }
-              });
-            }
-          });
-        }
         etatCatalogue = "pret";
         rendre();
         majInfoCatalogue();

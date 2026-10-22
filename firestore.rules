@@ -125,29 +125,63 @@ service cloud.firestore {
         || (request.auth != null && resource.data.uid == request.auth.uid);
     }
 
-    // Commandes : créées et gérées par l'administrateur uniquement.
+    // Commandes : créées par le client (bouton « Commander ») ou par l'administrateur.
     // Le client ne voit que les commandes associées à l'e-mail de son compte.
     match /commandes/{id} {
       allow read: if estAdmin()
         || (request.auth != null && request.auth.token.email != null
             && request.auth.token.email_verified == true
             && resource.data.clientEmail == request.auth.token.email.lower());
-      allow create: if estAdmin()
-        && request.resource.data.keys().hasOnly(['clientEmail', 'produit', 'prix', 'notes', 'statut', 'date'])
-        && request.resource.data.clientEmail is string
-        && request.resource.data.clientEmail.size() <= 120
-        && request.resource.data.produit is string
-        && request.resource.data.produit.size() <= 80
-        && request.resource.data.prix is number
-        && request.resource.data.prix >= 0
-        && request.resource.data.notes is string
-        && request.resource.data.notes.size() <= 500
-        && request.resource.data.statut in ['en-cours', 'expediee', 'installee']
+      // Commande passée par le client : e-mail vérifié obligatoire, statut initial imposé.
+      allow create: if request.auth != null
+        && request.auth.token.email != null
+        && request.auth.token.email_verified == true
+        && request.resource.data.clientEmail == request.auth.token.email.lower()
+        && request.resource.data.clientUid == request.auth.uid
+        && request.resource.data.statut == 'en-attente'
+        && request.resource.data.keys().hasOnly(['clientEmail', 'clientUid', 'nom', 'telephone', 'adresse', 'typeLivraison', 'produit', 'produitId', 'message', 'statut', 'date'])
+        && request.resource.data.nom is string && request.resource.data.nom.size() >= 2
+        && request.resource.data.nom.size() <= 80
+        && request.resource.data.telephone is string && request.resource.data.telephone.size() <= 30
+        && request.resource.data.adresse is string && request.resource.data.adresse.size() <= 200
+        && (request.resource.data.typeLivraison == 'retrait' || request.resource.data.adresse.size() >= 5)
+        && request.resource.data.typeLivraison in ['livraison', 'retrait']
+        && request.resource.data.produit is string && request.resource.data.produit.size() <= 80
+        && request.resource.data.produitId is string && request.resource.data.produitId.size() <= 60
+        && request.resource.data.message is string && request.resource.data.message.size() <= 500
         && request.resource.data.date == request.time;
-      // Mise à jour : l'administrateur ne peut changer que ces champs.
+      // Création manuelle par l'administrateur (commande téléphonique par exemple).
+      allow create: if (request.auth != null
+        && request.auth.token.email != null
+        && request.auth.token.email_verified == true
+        && request.resource.data.clientEmail == request.auth.token.email.lower()
+        && request.resource.data.clientUid == request.auth.uid
+        && request.resource.data.statut == 'en-attente'
+        && request.resource.data.keys().hasOnly(['clientEmail', 'clientUid', 'nom', 'telephone', 'adresse', 'typeLivraison', 'produit', 'produitId', 'message', 'statut', 'date'])
+        && request.resource.data.nom is string && request.resource.data.nom.size() >= 2
+        && request.resource.data.nom.size() <= 80
+        && request.resource.data.telephone is string && request.resource.data.telephone.size() <= 30
+        && request.resource.data.adresse is string && request.resource.data.adresse.size() <= 200
+        && (request.resource.data.typeLivraison == 'retrait' || request.resource.data.adresse.size() >= 5)
+        && request.resource.data.typeLivraison in ['livraison', 'retrait']
+        && request.resource.data.produit is string && request.resource.data.produit.size() <= 80
+        && request.resource.data.produitId is string && request.resource.data.produitId.size() <= 60
+        && request.resource.data.message is string && request.resource.data.message.size() <= 500
+        && request.resource.data.date == request.time)
+        || (estAdmin()
+        && request.resource.data.keys().hasOnly(['clientEmail', 'nom', 'telephone', 'adresse', 'typeLivraison', 'produit', 'message', 'statut', 'date'])
+        && request.resource.data.clientEmail is string && request.resource.data.clientEmail.size() <= 120
+        && request.resource.data.nom is string && request.resource.data.nom.size() <= 80
+        && request.resource.data.telephone is string && request.resource.data.telephone.size() <= 30
+        && request.resource.data.adresse is string && request.resource.data.adresse.size() <= 200
+        && request.resource.data.typeLivraison in ['livraison', 'retrait']
+        && request.resource.data.produit is string && request.resource.data.produit.size() <= 80
+        && request.resource.data.message is string && request.resource.data.message.size() <= 500
+        && request.resource.data.statut in ['en-attente', 'validee', 'traitee', 'en-cours', 'attente-livraison', 'livree']
+        && request.resource.data.date == request.time);
       allow update: if estAdmin()
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['statut', 'notes', 'prix', 'produit'])
-        && request.resource.data.statut in ['en-cours', 'expediee', 'installee'];
+        && request.resource.data.statut in ['en-attente', 'validee', 'traitee', 'en-cours', 'attente-livraison', 'livree'];
       allow delete: if estAdmin();
     }
 

@@ -391,3 +391,22 @@ html[dir="rtl"] .fav-btn { inset-inline-end: auto; inset-inline-start: 10px; }
 .notes-choix button.choisi { color: #c9a24d; border-color: #c9a24d; }
 #avis-connect { cursor: pointer; }
 .chargement { color: #8b8170; }
+
+/* Bouton Commander */
+.porte .commander {
+  width: 100%; padding: 13px 18px; margin-bottom: 8px; cursor: pointer;
+  border: 1px solid var(--or); border-radius: 12px;
+  background: linear-gradient(135deg, #c9a24d, #a8843d); color: #080808;
+  font-weight: 700; letter-spacing: .4px;
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+.porte .commander:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(201, 162, 77, .3); }
+
+/* Choix livraison / retrait */
+.choix-livraison { display: flex; flex-wrap: wrap; gap: 10px; }
+.choix-livraison .choix {
+  display: flex; align-items: center; gap: 8px; cursor: pointer;
+  padding: 10px 14px; border: 1px solid rgba(201, 162, 77, .35); border-radius: 10px;
+}
+.choix-livraison .choix input { accent-color: var(--or); }
+.fenetre .alerte { margin-top: 12px; color: #ffd9dc; }

@@ -1,8 +1,8 @@
 /* Administration FAHIMA PORTES — connexion sécurisée + gestion du catalogue,
    des demandes de devis, des commandes et des avis clients (Firestore). */
-import { firebaseConfig } from "./firebase-config.js?v=20261027";
-import { session, verifierAdmin } from "./session.js?v=20261027";
-import { PRODUITS_INITIAUX } from "./produits-initiaux.js?v=20261027";
+import { firebaseConfig } from "./firebase-config.js?v=20261028";
+import { session, verifierAdmin } from "./session.js?v=20261028";
+import { PRODUITS_INITIAUX } from "./produits-initiaux.js?v=20261028";
 
 const $ = (id) => document.getElementById(id);
 const configure = firebaseConfig.apiKey && firebaseConfig.apiKey !== "A_REMPLIR";
@@ -21,7 +21,15 @@ let arreterEcouteAvis = null;
 
 const TYPES = ["blindee", "fer-forge", "simple", "double", "extra-large", "chambre", "salon"];
 const STATUTS_DEVIS = ["nouveau", "en-cours", "traite"];
-const STATUTS_COMMANDE = ["en-cours", "expediee", "installee"];
+const STATUTS_COMMANDE = ["en-attente", "validee", "traitee", "en-cours", "attente-livraison", "livree"];
+const LIBELLES_COMMANDE = {
+  "en-attente": "En attente de validation",
+  validee: "Validée",
+  traitee: "Traitée",
+  "en-cours": "En cours",
+  "attente-livraison": "En attente de livraison",
+  livree: "Livrée"
+};
 
 function esc(s) { const d = document.createElement("div"); d.textContent = s == null ? "" : String(s); return d.innerHTML; }
 function montrerVue(id) {
@@ -423,13 +431,20 @@ function rendreCommandes(liste) {
   liste.forEach((v) => {
     const ligne = document.createElement("div");
     ligne.className = "ligne-produit ligne-large";
+    const infos = [];
+    if (v.nom) infos.push(esc(v.nom));
+    if (v.telephone) infos.push(esc(v.telephone));
+    if (v.typeLivraison) infos.push(v.typeLivraison === "livraison" ? "Livraison" : "Retrait à l'usine");
     ligne.innerHTML =
       '<div class="infos-ligne"><p class="nom-ligne">' + esc(v.produit || "") + " · " + esc(v.clientEmail || "") + "</p>" +
-      '<p class="details-ligne">' + esc(dateCourte(v.date)) + (v.prix ? " · " + esc(Number(v.prix).toFixed(2)) + " €" : "") + "</p>" +
+      '<p class="details-ligne">' + esc(dateCourte(v.date)) + (infos.length ? " · " + infos.join(" · ") : "") + "</p>" +
+      (v.adresse ? '<p class="details-ligne">Adresse : ' + esc(v.adresse) + "</p>" : "") +
+      (v.prix ? '<p class="details-ligne">Prix : ' + esc(Number(v.prix).toFixed(2)) + " €</p>" : "") +
+      (v.message ? '<p class="msg-ligne">' + esc(v.message) + "</p>" : "") +
       (v.notes ? '<p class="msg-ligne">' + esc(v.notes) + "</p>" : "") + "</div>" +
       '<div class="actions-ligne">' +
       '<select class="select-statut" aria-label="Statut">' +
-      STATUTS_COMMANDE.map((s) => '<option value="' + s + '"' + (v.statut === s ? " selected" : "") + ">" + s + "</option>").join("") +
+      STATUTS_COMMANDE.map((s) => '<option value="' + s + '"' + (v.statut === s ? " selected" : "") + ">" + (LIBELLES_COMMANDE[s] || s) + "</option>").join("") +
       "</select>" +
       '<button type="button" class="secondaire btn-mini danger" data-act="supprimer-commande">Supprimer</button>' +
       "</div>";
@@ -459,17 +474,24 @@ $("form-commande").addEventListener("submit", async (e) => {
   if (!db) return;
   const email = $("c-email").value.trim().toLowerCase();
   const produit = $("c-produit").value.trim();
-  const prix = Number($("c-prix").value);
+  const nom = $("c-nom").value.trim();
+  const tel = $("c-tel").value.trim();
+  const adresse = $("c-adresse").value.trim();
+  const typeLivraison = $("c-livraison").value;
   const notes = $("c-notes").value.trim();
   const statut = $("c-statut").value;
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return message("Indiquez l'adresse e-mail du client (celle de son compte).");
   if (!produit) return message("Indiquez le produit commandé.");
+  if (typeLivraison === "livraison" && adresse.length < 5) return message("Indiquez l'adresse de livraison (ou choisissez le retrait à l'usine).");
   try {
     await fstore.addDoc(fstore.collection(db, "commandes"), {
       clientEmail: email,
+      nom: nom.slice(0, 80),
+      telephone: tel.slice(0, 30),
+      adresse: typeLivraison === "livraison" ? adresse.slice(0, 200) : "",
+      typeLivraison: typeLivraison,
       produit: produit.slice(0, 80),
-      prix: prix > 0 ? prix : 0,
-      notes: notes.slice(0, 500),
+      message: notes.slice(0, 500),
       statut,
       date: fstore.serverTimestamp()
     });

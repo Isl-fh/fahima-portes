@@ -331,3 +331,22 @@ html[lang="ar"] .coordonnee dt { font-family: inherit; letter-spacing: 0; }
   .contact-carte iframe { min-height: 300px; }
   .realisation figcaption { font-size: 13px; }
 }
+
+/* Témoignages réels + formulaire de note */
+.temoignages .vide-dash { grid-column: 1 / -1; text-align: center; color: #b9a77a; padding: 24px 0; }
+.donner-avis {
+  margin-top: 40px; padding: 28px; border: 1px solid rgba(201, 162, 77, .35);
+  border-radius: 16px; background: rgba(255, 255, 255, .02); max-width: 640px; margin-left: auto; margin-right: auto;
+}
+.donner-avis h3 { margin: 0 0 16px; }
+.donner-avis .champ { margin-bottom: 14px; text-align: left; }
+.donner-avis textarea { width: 100%; }
+.notes-choix { display: flex; gap: 6px; margin-bottom: 16px; justify-content: center; }
+.notes-choix button {
+  font-size: 30px; line-height: 1; padding: 4px 8px; cursor: pointer;
+  background: transparent; border: 1px solid transparent; border-radius: 8px; color: #5a5548;
+}
+.notes-choix button.choisie { color: #c9a24d; }
+.notes-choix button:hover { border-color: #c9a24d; }
+.donner-avis .principal { margin-top: 6px; }
+.donner-avis .alerte { margin: 12px 0 0; }

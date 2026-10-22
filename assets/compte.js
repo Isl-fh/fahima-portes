@@ -1,7 +1,7 @@
 /* Espace client FAHIMA PORTES — connexion, inscription et tableau de bord :
    profil, demandes de devis, commandes, favoris et avis. */
-import { firebaseConfig, DOMAINE_TEL, TEL_ACTIF } from "./firebase-config.js?v=20261027";
-import { session, verifierAdmin } from "./session.js?v=20261027";
+import { firebaseConfig, DOMAINE_TEL, TEL_ACTIF } from "./firebase-config.js?v=20261028";
+import { session, verifierAdmin } from "./session.js?v=20261028";
 
 // Inscription / connexion par téléphone (SMS) : désactivée dans cette version.
 if (!TEL_ACTIF) {
@@ -336,9 +336,15 @@ function badgeStatut(statut) {
   return '<span class="badge-statut ' + (classes[statut] || "") + '">' + esc(txt) + "</span>";
 }
 function badgeCommande(statut) {
-  const cle = "statut.c." + statut;
-  const txt = FH.t(cle);
-  const classes = { "en-cours": "b-cours", expediee: "b-info", installee: "b-ok" };
+  const txt = FH.t("statut." + statut);
+  const classes = {
+    "en-attente": "b-nouveau",
+    validee: "b-info",
+    traitee: "b-info",
+    "en-cours": "b-cours",
+    "attente-livraison": "b-cours",
+    livree: "b-ok"
+  };
   return '<span class="badge-statut ' + (classes[statut] || "") + '">' + esc(txt) + "</span>";
 }
 
@@ -463,9 +469,15 @@ async function chargerCommandes(user) {
     liste.forEach((v) => {
       const art = document.createElement("article");
       art.className = "ligne-dash";
+      const livraison = v.typeLivraison === "livraison"
+        ? FH.t("cmd.livraison.domicile")
+        : (v.typeLivraison === "retrait" ? FH.t("cmd.retrait") : "");
       art.innerHTML =
         '<div class="infos-ligne"><p class="nom-ligne">' + esc(v.produit || "") + "</p>" +
-        '<p class="details-ligne">' + esc(dateCourte(v.date)) + " · " + badgeCommande(v.statut || "en-cours") + "</p>" +
+        '<p class="details-ligne">' + esc(dateCourte(v.date)) + " · " + badgeCommande(v.statut || "en-attente") +
+        (livraison ? " · " + esc(livraison) : "") + "</p>" +
+        (v.typeLivraison === "livraison" && v.adresse ? '<p class="msg-ligne">' + esc(v.adresse) + "</p>" : "") +
+        (v.message ? '<p class="msg-ligne">' + esc(v.message) + "</p>" : "") +
         (v.notes ? '<p class="msg-ligne">' + esc(v.notes) + "</p>" : "") + "</div>";
       zone.appendChild(art);
     });
