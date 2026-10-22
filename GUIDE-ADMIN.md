@@ -57,8 +57,13 @@ plan payant et reste désactivée dans cette version.
 ## Étape 6 — Relier le site
 
 Ouvrez `assets/firebase-config.js` et remplacez chaque `A_REMPLIR` par les
-valeurs copiées à l'étape 2, puis mettez le site à jour (fusion de la branche
-`refonte` dans `main` sur GitHub).
+valeurs copiées à l'étape 2.
+
+Important : faites d'abord valider le raccordement et les tests (inscription,
+droits administrateur, enregistrement d'offres) **sur un aperçu du site**,
+avant toute mise en ligne. La fusion de la branche `refonte` dans `main` —
+qui met à jour le site en ligne — est une décision séparée, à prendre
+uniquement après ces tests.
 
 ## Étape 7 — Créer votre compte administrateur
 
