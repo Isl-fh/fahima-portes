@@ -1,8 +1,8 @@
 /* Catalogue FAHIMA PORTES — produits, filtres, demande de devis,
    favoris et avis clients (notes + commentaires) via Firestore. */
-import { PRODUITS_INITIAUX } from "./produits-initiaux.js?v=20261030";
-import { firebaseConfig } from "./firebase-config.js?v=20261030";
-import { session } from "./session.js?v=20261030";
+import { PRODUITS_INITIAUX } from "./produits-initiaux.js?v=20261031";
+import { firebaseConfig } from "./firebase-config.js?v=20261031";
+import { session } from "./session.js?v=20261031";
 
 (function () {
   // Prix de référence en euros (convertis automatiquement en dinars)
@@ -422,12 +422,21 @@ import { session } from "./session.js?v=20261030";
     document.getElementById("cmd-nom").value = nom;
     document.getElementById("cmd-email").value = vraiEmail;
     document.getElementById("cmd-tel").value = session.user.phoneNumber || "";
+    /* Complète avec le profil enregistré sur le compte (nom, téléphone). */
+    if (session.fstore && session.db) session.fstore.getDoc(session.fstore.doc(session.db, "users", session.user.uid)).then(function (d) {
+      if (!d.exists()) return;
+      var pr = d.data() || {};
+      if (!document.getElementById("cmd-nom").value && (pr.prenom || pr.nom)) {
+        document.getElementById("cmd-nom").value = (pr.prenom + " " + (pr.nom || "")).trim();
+      }
+      if (pr.telephone) document.getElementById("cmd-tel").value = pr.telephone;
+    }).catch(function () {});
     document.getElementById("cmd-adresse").value = "";
     document.getElementById("cmd-message").value = "";
     var msg = document.getElementById("cmd-msg");
     msg.hidden = true;
     majChampAdresse();
-    fenetreCommande.hidden = false;
+    fenetreCommande.classList.add("active");
   }
 
   function majChampAdresse() {
@@ -438,7 +447,7 @@ import { session } from "./session.js?v=20261030";
   document.querySelectorAll('input[name="cmd-livraison"]').forEach(function (r) {
     r.addEventListener("change", majChampAdresse);
   });
-  document.getElementById("fermer-commande").addEventListener("click", function () { fenetreCommande.hidden = true; });
+  document.getElementById("fermer-commande").addEventListener("click", function () { fenetreCommande.classList.remove("active"); });
 
   document.getElementById("form-commande").addEventListener("submit", async function (e) {
     e.preventDefault();
@@ -472,7 +481,7 @@ import { session } from "./session.js?v=20261030";
         statut: "en-attente",
         date: F.serverTimestamp()
       });
-      fenetreCommande.hidden = true;
+      fenetreCommande.classList.remove("active");
       alert(FH.t("cmd.ok"));
     } catch (err) {
       erreur(FH.t("cmd.err") + (err && err.code ? " (" + err.code + ")" : ""));
