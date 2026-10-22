@@ -259,6 +259,8 @@ $("form-produit").addEventListener("submit", async (e) => {
   } catch (err) {
     if (err && err.message === "offre-existe")
       return message("Une offre porte déjà ce nom : choisissez un autre nom.");
+    if (err && (err.code === "permission-denied" || /permission/i.test(err.message || "")))
+      return message("Enregistrement impossible : droits insuffisants. Publiez les dernières règles de sécurité dans Firebase (Firestore Database > Règles > coller le fichier firestore.rules du site > Publier), puis réessayez.", true);
     message("Enregistrement impossible : " + err.message);
   }
 });
