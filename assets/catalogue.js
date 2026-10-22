@@ -1,15 +1,14 @@
-/* Catalogue FAHIMA PORTES — produits, filtres et demande de devis.
-   Les offres affichées proviennent de Firestore dès que Firebase est configuré
-   (gestion via admin.html) ; sinon la liste ci-dessous sert d'aperçu. */
+/* Catalogue FAHIMA PORTES — produits, filtres, demande de devis,
+   favoris et avis clients (notes + commentaires) via Firestore. */
 import { PRODUITS_INITIAUX } from "./produits-initiaux.js";
 import { firebaseConfig } from "./firebase-config.js";
+import { session } from "./session.js";
 
 (function () {
   // Prix de référence en euros (convertis automatiquement en dinars)
   var PRODUITS = PRODUITS_INITIAUX.map(function (p, i) {
     return Object.assign({ ordre: i + 1, visible: true }, p);
   });
-
 
   var grille = document.getElementById("catalogue");
   var aucun = document.getElementById("aucun-resultat");
@@ -18,7 +17,19 @@ import { firebaseConfig } from "./firebase-config.js";
   var prixMin = document.getElementById("prix-min");
   var prixMax = document.getElementById("prix-max");
 
-  function esc(s) { var d = document.createElement("div"); d.textContent = s; return d.innerHTML; }
+  // Notes par produit : { id: { somme, nombre } }
+  var statsAvis = {};
+  // Favoris de l'utilisateur connecté : ensemble d'identifiants
+  var favoris = {};
+
+  function esc(s) { var d = document.createElement("div"); d.textContent = s == null ? "" : String(s); return d.innerHTML; }
+
+  function etoiles(note) {
+    note = Math.round(note);
+    var pleines = "", vides = "";
+    for (var i = 0; i < 5; i++) { pleines += "★"; if (i >= note) vides += "☆"; }
+    return "★★★★★".slice(0, note) + "☆☆☆☆☆".slice(0, 5 - note);
+  }
 
   function rendre() {
     var L = FH.etat.lang;
@@ -31,9 +42,11 @@ import { firebaseConfig } from "./firebase-config.js";
       a.dataset.id = p.id;
       a.innerHTML =
         '<img alt="" width="1024" height="1024" loading="lazy">' +
+        '<button class="fav-btn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 20.5c-5.2-3.5-8.5-6.4-8.5-10A4.7 4.7 0 0 1 8.2 6c1.6 0 3 .8 3.8 2.1C12.8 6.8 14.2 6 15.8 6a4.7 4.7 0 0 1 4.7 4.5c0 3.6-3.3 6.5-8.5 10Z"/></svg></button>' +
         '<div class="informations">' +
         "<h2>" + esc(x.n) + "</h2>" +
         '<p class="type">' + esc(types) + "</p>" +
+        '<button class="avis-entree" type="button"></button>' +
         '<p class="description">' + esc(x.d) + "</p>" +
         '<p class="prix"><small>' + esc(FH.t("cat.from")) + "</small>" + esc(FH.prix(p.eur)) + "</p>" +
         '<ul class="details">' + x.f.map(function (f) { return "<li>" + esc(f) + "</li>"; }).join("") + "</ul>" +
@@ -43,6 +56,10 @@ import { firebaseConfig } from "./firebase-config.js";
       image.src = p.img; // affectation directe : jamais insérée dans du HTML
       image.alt = x.n;
       a.querySelector(".devis").addEventListener("click", function () { ouvrir(p); });
+      a.querySelector(".fav-btn").addEventListener("click", function () { basculerFavori(p.id); });
+      a.querySelector(".avis-entree").addEventListener("click", function () { ouvrirAvis(p); });
+      majFavBouton(a, p.id);
+      majAvisEntree(a, p.id);
       grille.insertBefore(a, aucun);
     });
     document.querySelectorAll(".sym").forEach(function (s) { s.textContent = FH.symbole(); });
@@ -58,6 +75,183 @@ import { firebaseConfig } from "./firebase-config.js";
     prixMin.step = prixMax.step = FH.etat.cur === "EUR" ? "1" : "1000";
     filtrer();
   }
+
+  // ---------- Favoris ----------
+  function majFavBouton(carte, id) {
+    var b = carte.querySelector(".fav-btn");
+    if (!b) return;
+    var actif = !!favoris[id];
+    b.classList.toggle("actif", actif);
+    b.setAttribute("aria-label", FH.t(actif ? "fav.retirer" : "fav.ajouter"));
+  }
+
+  async function chargerFavoris() {
+    if (!session.user || !session.fstore || !session.db) { favoris = {}; return; }
+    try {
+      var snap = await session.fstore.getDocs(
+        session.fstore.collection(session.db, "users", session.user.uid, "favoris")
+      );
+      favoris = {};
+      snap.forEach(function (d) { favoris[d.id] = true; });
+      grille.querySelectorAll(".porte").forEach(function (c) { majFavBouton(c, c.dataset.id); });
+    } catch (e) { /* favoris indisponibles (règles non publiées) */ }
+  }
+
+  async function basculerFavori(id) {
+    if (!session.user) { window.location.href = "compte.html"; return; }
+    if (!session.fstore || !session.db) return;
+    try {
+      var ref = session.fstore.doc(session.db, "users", session.user.uid, "favoris", id);
+      if (favoris[id]) { await session.fstore.deleteDoc(ref); delete favoris[id]; }
+      else { await session.fstore.setDoc(ref, { date: session.fstore.serverTimestamp() }); favoris[id] = true; }
+      grille.querySelectorAll(".porte").forEach(function (c) { if (c.dataset.id === id) majFavBouton(c, id); });
+    } catch (e) {
+      console.warn("Favori non enregistré.", e);
+    }
+  }
+
+  // ---------- Avis ----------
+  function majAvisEntree(carte, id) {
+    var b = carte.querySelector(".avis-entree");
+    if (!b) return;
+    var s = statsAvis[id];
+    if (s && s.nombre) {
+      b.innerHTML = '<span class="notes">' + etoiles(s.somme / s.nombre) + "</span> " +
+        FH.nombre(s.somme / s.nombre, 1) + " · " + s.nombre + " " + esc(FH.t("avis.titre").toLowerCase());
+    } else {
+      b.textContent = FH.t("avis.donner");
+    }
+  }
+
+  async function chargerStatsAvis() {
+    if (!session.fstore || !session.db) return;
+    try {
+      // Requête publique : seuls les avis visibles sont lisibles par tous.
+      var snap = await session.fstore.getDocs(
+        session.fstore.query(session.fstore.collection(session.db, "avis"), session.fstore.where("visible", "==", true))
+      );
+      statsAvis = {};
+      snap.forEach(function (d) {
+        var v = d.data();
+        if (!v || typeof v.note !== "number" || !v.produit) return;
+        if (!statsAvis[v.produit]) statsAvis[v.produit] = { somme: 0, nombre: 0 };
+        statsAvis[v.produit].somme += v.note;
+        statsAvis[v.produit].nombre++;
+      });
+      grille.querySelectorAll(".porte").forEach(function (c) { majAvisEntree(c, c.dataset.id); });
+    } catch (e) { /* avis indisponibles (règles non publiées) */ }
+  }
+
+  var fenetreAvis = document.getElementById("fenetre-avis");
+  var produitAvis = null;
+
+  async function ouvrirAvis(p) {
+    produitAvis = p;
+    document.getElementById("avis-produit").textContent = (p[FH.etat.lang] || p.fr).n;
+    fenetreAvis.classList.add("active");
+    document.getElementById("fermer-avis").focus();
+    await afficherListeAvis(p.id);
+    majFormulaireAvis();
+  }
+  function fermerAvis() { fenetreAvis.classList.remove("active"); produitAvis = null; }
+  document.getElementById("fermer-avis").addEventListener("click", fermerAvis);
+  fenetreAvis.addEventListener("click", function (e) { if (e.target === fenetreAvis) fermerAvis(); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") fermerAvis(); });
+
+  async function afficherListeAvis(id) {
+    var zone = document.getElementById("avis-liste");
+    zone.innerHTML = '<p class="chargement">…</p>';
+    if (!session.fstore || !session.db) { zone.innerHTML = ""; return; }
+    try {
+      var snap = await session.fstore.getDocs(
+        session.fstore.query(
+          session.fstore.collection(session.db, "avis"),
+          session.fstore.where("produit", "==", id),
+          session.fstore.where("visible", "==", true)
+        )
+      );
+      var liste = snap.docs.map(function (d) { return Object.assign({ id: d.id }, d.data()); })
+        .sort(function (a, b) { return (b.date && b.date.seconds || 0) - (a.date && a.date.seconds || 0); });
+      if (!liste.length) {
+        zone.innerHTML = '<p class="note">' + esc(FH.t("avis.aucun")) + "</p>";
+        return;
+      }
+      zone.innerHTML = "";
+      liste.forEach(function (v) {
+        var art = document.createElement("article");
+        art.className = "avis-item";
+        var quand = v.date ? new Date(v.date.seconds * 1000).toLocaleDateString(FH.etat.lang === "ar" ? "ar" : FH.etat.lang) : "";
+        art.innerHTML =
+          '<p class="etoiles" aria-hidden="true">' + etoiles(v.note) + "</p>" +
+          '<p class="avis-texte">' + esc(v.texte) + "</p>" +
+          '<footer><strong>' + esc(v.nom || FH.t("nav.account")) + "</strong> <span>" + esc(quand) + "</span></footer>";
+        zone.appendChild(art);
+      });
+    } catch (e) {
+      zone.innerHTML = "";
+    }
+  }
+
+  var noteChoisie = 0;
+  function majFormulaireAvis() {
+    var form = document.getElementById("form-avis");
+    var connecte = !!session.user;
+    document.getElementById("avis-connect").hidden = connecte;
+    form.querySelector('button[type="submit"]').disabled = !connecte;
+    if (!connecte) {
+      // Le clic sur le message renvoie vers la connexion.
+      var p = document.getElementById("avis-connect");
+      p.style.cursor = "pointer";
+      p.onclick = function () { window.location.href = "compte.html"; };
+    }
+  }
+  document.getElementById("notes-choix").querySelectorAll("button").forEach(function (b) {
+    b.addEventListener("click", function () {
+      noteChoisie = Number(b.dataset.note);
+      document.getElementById("notes-choix").querySelectorAll("button").forEach(function (x) {
+        x.classList.toggle("choisi", Number(x.dataset.note) <= noteChoisie);
+      });
+    });
+  });
+
+  document.getElementById("form-avis").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    if (!session.user) { window.location.href = "compte.html"; return; }
+    var texte = document.getElementById("avis-texte").value.trim();
+    if (!noteChoisie || texte.length < 2) return;
+    if (!session.fstore || !session.db) return;
+    var u = session.user;
+    var prenom = (u.displayName || "").split(" ")[0] || FH.t("nav.account");
+    try {
+      // Un seul avis par personne et par modèle : on remplace l'ancien.
+      var snap = await session.fstore.getDocs(
+        session.fstore.query(
+          session.fstore.collection(session.db, "avis"),
+          session.fstore.where("produit", "==", produitAvis.id),
+          session.fstore.where("uid", "==", u.uid)
+        )
+      );
+      var donnees = {
+        produit: produitAvis.id, uid: u.uid, nom: prenom,
+        note: noteChoisie, texte: texte, visible: true,
+        date: session.fstore.serverTimestamp()
+      };
+      if (snap.size) {
+        await session.fstore.setDoc(session.fstore.doc(session.db, "avis", snap.docs[0].id), donnees);
+      } else {
+        await session.fstore.addDoc(session.fstore.collection(session.db, "avis"), donnees);
+      }
+      document.getElementById("avis-texte").value = "";
+      noteChoisie = 0;
+      document.getElementById("notes-choix").querySelectorAll("button").forEach(function (x) { x.classList.remove("choisi"); });
+      await afficherListeAvis(produitAvis.id);
+      await chargerStatsAvis();
+      alert(FH.t("avis.merci"));
+    } catch (err) {
+      console.warn("Avis non enregistré.", err);
+      alert(FH.t("avis.erreur"));
+    }
+  });
 
   function normaliser(s) {
     return (s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
@@ -122,6 +316,12 @@ import { firebaseConfig } from "./firebase-config.js";
     majInfoCatalogue();
   });
 
+  // Connexion / déconnexion : met à jour favoris et formulaire d'avis
+  document.addEventListener("fh:user", function () {
+    chargerFavoris();
+    if (fenetreAvis.classList.contains("active") && produitAvis) majFormulaireAvis();
+  });
+
   // Fenêtre de devis
   var fenetre = document.getElementById("fenetre");
   var formulaire = document.getElementById("formulaire");
@@ -148,9 +348,29 @@ import { firebaseConfig } from "./firebase-config.js";
   fenetre.addEventListener("click", function (e) { if (e.target === fenetre) fermer(); });
   document.addEventListener("keydown", function (e) { if (e.key === "Escape") fermer(); });
 
-  formulaire.addEventListener("submit", function (e) {
+  // Enregistre la demande dans l'espace client (si connecté).
+  async function memoriserDemande(d) {
+    if (!session.user || !session.fstore || !session.db) return;
+    try {
+      await session.fstore.addDoc(session.fstore.collection(session.db, "devis"), {
+        uid: session.user.uid,
+        nom: String(d.get("nom") || "").slice(0, 80),
+        telephone: String(d.get("telephone") || "").slice(0, 30),
+        email: String(d.get("email") || "").slice(0, 120),
+        adresse: String(d.get("adresse") || "").slice(0, 200),
+        produit: produitChoisi ? (produitChoisi.fr && produitChoisi.fr.n || "") : String(d.get("produit") || "").slice(0, 80),
+        message: String(d.get("message") || "").slice(0, 1000),
+        statut: "nouveau",
+        langue: FH.etat.lang,
+        date: session.fstore.serverTimestamp()
+      });
+    } catch (e) { console.warn("Demande non enregistrée dans l'espace client.", e); }
+  }
+
+  formulaire.addEventListener("submit", async function (e) {
     e.preventDefault();
     var d = new FormData(formulaire);
+    await memoriserDemande(d);
     var nomFr = produitChoisi ? produitChoisi.fr.n : d.get("produit");
     var prixTxt = produitChoisi ? FH.prix(produitChoisi.eur) : "";
     var sujet = encodeURIComponent("Demande de devis - " + nomFr);
@@ -168,9 +388,10 @@ import { firebaseConfig } from "./firebase-config.js";
   });
 
   // Envoi du devis par WhatsApp (message dans la langue active)
-  document.getElementById("envoyer-wa").addEventListener("click", function () {
+  document.getElementById("envoyer-wa").addEventListener("click", async function () {
     if (!formulaire.reportValidity()) return;
     var d = new FormData(formulaire);
+    await memoriserDemande(d);
     var L = FH.etat.lang;
     var prod = produitChoisi ? (produitChoisi[L] || produitChoisi.fr) : null;
     var nomModele = prod ? prod.n : d.get("produit");
@@ -190,33 +411,31 @@ import { firebaseConfig } from "./firebase-config.js";
   // - Firebase configuré : les offres viennent uniquement de Firestore.
   //   Base vide = catalogue vide ; erreur = message d'indisponibilité visible.
   if (firebaseConfig.apiKey && firebaseConfig.apiKey !== "A_REMPLIR") {
-    var v = "10.12.2";
     etatCatalogue = "chargement";
     PRODUITS = [];
     rendre();
     majInfoCatalogue();
-    Promise.all([
-      import("https://www.gstatic.com/firebasejs/" + v + "/firebase-app.js"),
-      import("https://www.gstatic.com/firebasejs/" + v + "/firebase-firestore.js")
-    ]).then(async function (mods) {
-      var app = mods[0].initializeApp(firebaseConfig);
-      var F = mods[1];
-      var bdd = F.getFirestore(app);
-      // Requête publique simple (filtre visible uniquement, sans orderBy :
-      // un index composé serait sinon exigé par Firestore). Tri côté navigateur.
-      var snap = await F.getDocs(F.query(F.collection(bdd, "products"), F.where("visible", "==", true)));
-      PRODUITS = snap.docs.map(function (d) { return Object.assign({ id: d.id }, d.data()); })
-        .sort(function (a, b) { return (a.ordre || 999) - (b.ordre || 999); });
-      etatCatalogue = "pret";
-      rendre();
-      majInfoCatalogue();
-      if (!PRODUITS.length) console.warn("Catalogue Firestore vide : aucune offre visible. Ajoutez des offres depuis l'administration (admin.html).");
-    }).catch(function (e) {
-      console.warn("Catalogue géré indisponible.", e);
-      etatCatalogue = "erreur";
-      PRODUITS = [];
-      rendre();
-      majInfoCatalogue();
+    session.quand.then(async function () {
+      try {
+        var F = session.fstore;
+        // Requête publique simple (filtre visible uniquement, sans orderBy :
+        // un index composé serait sinon exigé par Firestore). Tri côté navigateur.
+        var snap = await F.getDocs(F.query(F.collection(session.db, "products"), F.where("visible", "==", true)));
+        PRODUITS = snap.docs.map(function (d) { return Object.assign({ id: d.id }, d.data()); })
+          .sort(function (a, b) { return (a.ordre || 999) - (b.ordre || 999); });
+        etatCatalogue = "pret";
+        rendre();
+        majInfoCatalogue();
+        chargerStatsAvis();
+        chargerFavoris();
+        if (!PRODUITS.length) console.warn("Catalogue Firestore vide : aucune offre visible. Ajoutez des offres depuis l'administration (admin.html).");
+      } catch (e) {
+        console.warn("Catalogue géré indisponible.", e);
+        etatCatalogue = "erreur";
+        PRODUITS = [];
+        rendre();
+        majInfoCatalogue();
+      }
     });
   } else {
     rendre();

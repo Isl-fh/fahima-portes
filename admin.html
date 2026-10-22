@@ -182,6 +182,53 @@
                     <button type="button" class="secondaire" id="btn-annuler">Annuler</button>
                 </div>
             </form>
+
+            <h2 class="titre-section-admin">Demandes de devis</h2>
+            <p class="aide-section-admin">Toutes les demandes envoyées depuis le catalogue par les clients connectés. Changez le statut pour informer le client dans son espace.</p>
+            <div class="admin-tableau" id="liste-devis" aria-live="polite"></div>
+
+            <h2 class="titre-section-admin">Commandes</h2>
+            <p class="aide-section-admin">Créez une commande pour un client : elle apparaît dans son espace (Mes commandes) avec son statut.</p>
+            <div class="admin-actions">
+                <button type="button" class="principal" id="btn-commande">+ Nouvelle commande</button>
+            </div>
+            <form id="form-commande" class="formulaire-produit" novalidate hidden>
+                <div class="grille-champs">
+                    <div class="champ">
+                        <label for="c-email">E-mail du client (celui de son compte) *</label>
+                        <input id="c-email" type="email" dir="ltr" required>
+                    </div>
+                    <div class="champ">
+                        <label for="c-produit">Produit commandé *</label>
+                        <input id="c-produit" required maxlength="80">
+                    </div>
+                    <div class="champ">
+                        <label for="c-prix">Prix en euros (facultatif)</label>
+                        <input id="c-prix" type="number" min="0" step="0.01" dir="ltr">
+                    </div>
+                    <div class="champ">
+                        <label for="c-statut">Statut</label>
+                        <select id="c-statut">
+                            <option value="en-cours">en-cours</option>
+                            <option value="expediee">expediee</option>
+                            <option value="installee">installee</option>
+                        </select>
+                    </div>
+                    <div class="champ complet">
+                        <label for="c-notes">Notes (facultatif)</label>
+                        <textarea id="c-notes" rows="2" maxlength="500"></textarea>
+                    </div>
+                </div>
+                <div class="actions-dash">
+                    <button type="submit" class="principal">Créer la commande</button>
+                    <button type="button" class="secondaire" id="btn-commande-annuler">Annuler</button>
+                </div>
+            </form>
+            <div class="admin-tableau" id="liste-commandes" aria-live="polite"></div>
+
+            <h2 class="titre-section-admin">Avis clients</h2>
+            <p class="aide-section-admin">Les notes et commentaires laissés par les clients sur les modèles. Vous pouvez masquer ou supprimer un avis.</p>
+            <div class="admin-tableau" id="liste-avis" aria-live="polite"></div>
         </section>
     </main>
 

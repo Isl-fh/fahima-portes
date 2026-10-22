@@ -186,6 +186,54 @@
                     <button type="button" class="secondaire" id="btn-resend" data-i18n="acc.resend"></button>
                     <button type="button" class="secondaire" id="btn-check" data-i18n="acc.check"></button>
                 </div>
+
+                <div class="onglets-dash" role="tablist">
+                    <button type="button" role="tab" data-dash="profil" class="actif" data-i18n="acc.tab.profil">Mon profil</button>
+                    <button type="button" role="tab" data-dash="devis" data-i18n="acc.tab.devis">Mes demandes</button>
+                    <button type="button" role="tab" data-dash="commandes" data-i18n="acc.tab.commandes">Mes commandes</button>
+                    <button type="button" role="tab" data-dash="favoris" data-i18n="acc.tab.favoris">Mes favoris</button>
+                    <button type="button" role="tab" data-dash="avis" data-i18n="acc.tab.avis">Mes avis</button>
+                </div>
+
+                <!-- Mon profil -->
+                <section id="dash-profil">
+                    <h3 data-i18n="acc.profil.titre">Mes informations personnelles</h3>
+                    <form id="form-profil" class="formulaire" novalidate>
+                        <div class="deux">
+                            <div class="champ"><label for="pr-prenom" data-i18n="acc.firstname">Prénom</label><input id="pr-prenom" autocomplete="given-name"></div>
+                            <div class="champ"><label for="pr-nom" data-i18n="acc.lastname">Nom</label><input id="pr-nom" autocomplete="family-name"></div>
+                        </div>
+                        <div class="champ"><label for="pr-tel" data-i18n="acc.phone">Numéro de téléphone</label><input id="pr-tel" type="tel" dir="ltr" autocomplete="tel"></div>
+                        <button type="submit" class="principal" data-i18n="acc.profil.enregistrer">Enregistrer</button>
+                    </form>
+                    <h3 data-i18n="acc.pw.changer">Changer mon mot de passe</h3>
+                    <form id="form-pw" class="formulaire" novalidate>
+                        <div class="champ"><label for="pw-actuel" data-i18n="acc.pw.actuel">Mot de passe actuel</label><input id="pw-actuel" type="password" autocomplete="current-password" dir="ltr"></div>
+                        <div class="champ"><label for="pw-nouveau" data-i18n="acc.pw.nouveau">Nouveau mot de passe</label><input id="pw-nouveau" type="password" autocomplete="new-password" dir="ltr"></div>
+                        <button type="submit" class="principal" data-i18n="acc.pw.changer">Changer mon mot de passe</button>
+                    </form>
+                </section>
+
+                <!-- Mes demandes de devis -->
+                <section id="dash-devis" hidden>
+                    <div id="liste-devis"></div>
+                </section>
+
+                <!-- Mes commandes -->
+                <section id="dash-commandes" hidden>
+                    <div id="liste-commandes"></div>
+                </section>
+
+                <!-- Mes favoris -->
+                <section id="dash-favoris" hidden>
+                    <div id="liste-favoris"></div>
+                </section>
+
+                <!-- Mes avis -->
+                <section id="dash-avis" hidden>
+                    <div id="liste-mes-avis"></div>
+                </section>
+
                 <div class="actions-dash">
                     <a class="principal" href="catalogue.html" data-i18n="acc.goto"></a>
                     <a class="principal" id="dash-admin" href="admin.html" hidden data-i18n="acc.admin">Administration</a>

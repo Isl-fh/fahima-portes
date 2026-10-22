@@ -2,10 +2,21 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Un administrateur est un compte dont l'UID figure dans la collection « admins ».
-    function estAdmin() {
+    // Un administrateur est un compte dont l'UID figure dans la collection
+    // « Admins » (avec un A majuscule — nom utilisé dans la console Firebase).
+    // « admins » (minuscule) reste acceptée pour compatibilité.
+    // Un document sans champ « role » est considéré administrateur ;
+    // sinon le rôle doit valoir « admin ».
+    function adminDans(col) {
       return request.auth != null
-        && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+        && exists(/databases/$(database)/documents/$(col)/$(request.auth.uid))
+        && (
+          !('role' in get(/databases/$(database)/documents/$(col)/$(request.auth.uid)).data)
+          || get(/databases/$(database)/documents/$(col)/$(request.auth.uid)).data.role == 'admin'
+        );
+    }
+    function estAdmin() {
+      return adminDans('Admins') || adminDans('admins');
     }
 
     // Catalogue : offres du site.
@@ -27,8 +38,8 @@ service cloud.firestore {
         && request.resource.data.visible is bool
         && request.resource.data.types is list
         && request.resource.data.types.size() >= 1
-        && request.resource.data.types.size() <= 6
-        && request.resource.data.types.hasOnly(['blindee', 'fer-forge', 'simple', 'double', 'chambre', 'salon'])
+        && request.resource.data.types.size() <= 7
+        && request.resource.data.types.hasOnly(['blindee', 'fer-forge', 'simple', 'double', 'extra-large', 'chambre', 'salon'])
         && request.resource.data.img is string
         && request.resource.data.img.size() <= 300
         && request.resource.data.fr is map
@@ -61,9 +72,112 @@ service cloud.firestore {
 
     // Administration : chaque administrateur peut uniquement consulter son propre statut.
     // Les administrateurs sont ajoutés depuis la console Firebase (jamais depuis le site).
+    match /Admins/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false;
+    }
     match /admins/{uid} {
       allow read: if request.auth != null && request.auth.uid == uid;
       allow write: if false;
+    }
+
+    // Profils clients : chaque client ne lit et modifie que son propre profil.
+    // Les administrateurs peuvent consulter les profils (gestion des commandes).
+    match /users/{uid} {
+      allow read: if request.auth != null && (request.auth.uid == uid || estAdmin());
+      allow create, update: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['prenom', 'nom', 'email', 'telephone'])
+        && request.resource.data.prenom is string
+        && request.resource.data.prenom.size() <= 60
+        && request.resource.data.nom is string
+        && request.resource.data.nom.size() <= 60
+        && request.resource.data.email is string
+        && request.resource.data.email.size() <= 120
+        && request.resource.data.telephone is string
+        && request.resource.data.telephone.size() <= 30;
+      allow delete: if false;
+    }
+
+    // Favoris : sous-collection du profil, propriétaire uniquement.
+    match /users/{uid}/favoris/{produit} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // Demandes de devis : créées par le client, suivies par l'administrateur.
+    match /devis/{id} {
+      allow read: if estAdmin()
+        || (request.auth != null && resource.data.uid == request.auth.uid);
+      allow create: if request.auth != null
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.keys().hasOnly(['uid', 'nom', 'telephone', 'email', 'adresse', 'produit', 'message', 'statut', 'langue', 'date'])
+        && request.resource.data.nom is string && request.resource.data.nom.size() <= 80
+        && request.resource.data.telephone is string && request.resource.data.telephone.size() <= 30
+        && request.resource.data.email is string && request.resource.data.email.size() <= 120
+        && request.resource.data.adresse is string && request.resource.data.adresse.size() <= 200
+        && request.resource.data.produit is string && request.resource.data.produit.size() <= 80
+        && request.resource.data.message is string && request.resource.data.message.size() <= 1000
+        && request.resource.data.statut == 'nouveau'
+        && request.resource.data.langue in ['fr', 'ar', 'en']
+        && request.resource.data.date == request.time;
+      // Seul l'administrateur change le statut ; le client peut annuler (supprimer) sa demande.
+      allow update: if estAdmin();
+      allow delete: if estAdmin()
+        || (request.auth != null && resource.data.uid == request.auth.uid);
+    }
+
+    // Commandes : créées et gérées par l'administrateur uniquement.
+    // Le client ne voit que les commandes associées à l'e-mail de son compte.
+    match /commandes/{id} {
+      allow read: if estAdmin()
+        || (request.auth != null && request.auth.token.email != null
+            && resource.data.clientEmail == request.auth.token.email.lower());
+      allow create: if estAdmin()
+        && request.resource.data.keys().hasOnly(['clientEmail', 'produit', 'prix', 'notes', 'statut', 'date'])
+        && request.resource.data.clientEmail is string
+        && request.resource.data.clientEmail.size() <= 120
+        && request.resource.data.produit is string
+        && request.resource.data.produit.size() <= 80
+        && request.resource.data.prix is number
+        && request.resource.data.prix >= 0
+        && request.resource.data.notes is string
+        && request.resource.data.notes.size() <= 500
+        && request.resource.data.statut in ['en-cours', 'expediee', 'installee']
+        && request.resource.data.date == request.time;
+      // Mise à jour : l'administrateur ne peut changer que ces champs.
+      allow update: if estAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['statut', 'notes', 'prix', 'produit'])
+        && request.resource.data.statut in ['en-cours', 'expediee', 'installee'];
+      allow delete: if estAdmin();
+    }
+
+    // Avis clients (note de 1 à 5 + commentaire).
+    // - Lecture publique des avis visibles ; chaque auteur relit et supprime le sien.
+    // - Un avis est immuable (pour l'auteur) : il peut simplement le supprimer.
+    // - L'administrateur peut masquer (visible) ou supprimer un avis.
+    match /avis/{id} {
+      allow read: if resource.data.visible == true
+        || estAdmin()
+        || (request.auth != null && resource.data.uid == request.auth.uid);
+      allow create: if request.auth != null
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.keys().hasOnly(['produit', 'uid', 'nom', 'note', 'texte', 'date', 'visible'])
+        && request.resource.data.produit is string
+        && request.resource.data.produit.size() <= 60
+        && request.resource.data.nom is string
+        && request.resource.data.nom.size() <= 60
+        && request.resource.data.note is int
+        && request.resource.data.note >= 1
+        && request.resource.data.note <= 5
+        && request.resource.data.texte is string
+        && request.resource.data.texte.size() >= 2
+        && request.resource.data.texte.size() <= 400
+        && request.resource.data.visible == true
+        && request.resource.data.date == request.time;
+      // L'administrateur peut uniquement basculer la visibilité.
+      allow update: if estAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['visible']);
+      allow delete: if estAdmin()
+        || (request.auth != null && resource.data.uid == request.auth.uid);
     }
   }
 }

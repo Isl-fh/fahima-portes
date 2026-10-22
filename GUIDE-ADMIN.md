@@ -1,5 +1,15 @@
 # Guide d'installation — Espace client + Administration du catalogue
 
+> **Correction importante (octobre 2026).** L'administration ne fonctionnait
+> plus car le document administrateur se trouvait dans la collection `Admins`
+> (A majuscule) alors que les règles de sécurité cherchaient `admins`
+> (minuscule). Le site accepte désormais les deux graphies, **mais il faut
+> absolument republier les règles** : dans la console Firebase, menu
+> **Firestore Database > Règles**, remplacez tout le contenu par le fichier
+> `firestore.rules` du site, puis cliquez **Publier**. Sans cette étape,
+> l'administration et les nouvelles fonctions client (avis, favoris, demandes,
+> commandes) resteront bloquées.
+
 Ce guide explique comment activer la création de comptes clients et la gestion
 du catalogue (ajouter des offres, changer les prix et les descriptions) pour le
 site FAHIMA PORTES. Le plan Firebase « Spark » couvre le besoin actuel
@@ -10,12 +20,19 @@ plan payant et reste désactivée dans cette version.
 
 - **Espace client** (`compte.html`) : création de compte et connexion par e-mail
   (le téléphone par SMS est prévu mais demande une configuration payante — à activer plus tard).
+  Tableau de bord avec : **Mon profil** (prénom, nom, téléphone, mot de passe),
+  **Mes demandes** (devis envoyés depuis le catalogue, avec statut),
+  **Mes commandes** (statut : en cours, expédiée, installée),
+  **Mes favoris** (cœur sur les modèles du catalogue) et **Mes avis**.
 - **Administration** (`admin.html`) : réservée aux comptes administrateurs, elle permet de :
   - ajouter une nouvelle offre (nom, description, prix, catégories, image) ;
   - modifier le prix et les descriptions d'une offre ;
   - masquer ou afficher une offre ;
   - supprimer une offre ;
-  - importer en un clic les 8 modèles actuels comme point de départ.
+  - importer en un clic les 8 modèles actuels comme point de départ ;
+  - suivre les **demandes de devis** des clients (statut : nouveau, en cours, traitée) ;
+  - créer et suivre des **commandes** pour les clients ;
+  - modérer les **avis clients** (masquer ou supprimer).
 - **Catalogue public** (`catalogue.html`) : affiche les offres enregistrées dans
   la base, dans les 3 langues. La page lit la base à chaque chargement : un
   visiteur voit vos modifications en actualisant la page (pas d'écoute en temps
@@ -72,8 +89,9 @@ uniquement après ces tests.
    créez votre compte avec votre e-mail personnel.
 2. Dans la console Firebase : **Authentication > Utilisateurs**, et copiez
    l'**UID** de votre compte (colonne « UID utilisateur »).
-3. Dans **Firestore Database**, ouvrez la collection `admins` (déjà créée)
-   et cliquez **« Ajouter un document »** :
+3. Dans **Firestore Database**, ouvrez la collection `Admins` (avec un A majuscule —
+   le nom utilisé par le site ; créez-la si elle n'existe pas) et cliquez
+   **« Ajouter un document »** :
    - ID du document : **collez votre UID**
    - Champ : `role`, valeur : `admin`
 4. C'est tout. Pour ajouter un autre administrateur plus tard, refaites
@@ -114,7 +132,7 @@ uniquement après ces tests.
 
 Deux comptes temporaires ont été créés pour la validation :
 
-1. Dans **Firestore Database > admins**, supprimez le document
+1. Dans **Firestore Database > Admins**, supprimez le document
    `CKOHYbamr8YocQW5iblT47bpr0l1` (compte de test administrateur). Ne vous
    contentez pas de modifier son champ `role` : tant que le document existe,
    le compte garde ses droits.

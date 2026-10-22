@@ -210,6 +210,13 @@ html[dir="rtl"] .logo-btn .badge { right: auto; left: -4px; }
   gap: 7px;
 }
 .navigation .account-link svg { width: 16px; height: 16px; }
+/* Connecté : le texte « Se connecter » laisse place à une icône anonyme */
+.navigation .account-link .compte-icone { display: inline-flex; }
+.navigation .account-link .compte-icone svg {
+  width: 20px; height: 20px;
+  color: var(--or-clair);
+  filter: drop-shadow(0 0 5px rgba(242, 213, 138, .35));
+}
 
 /* ---------- Pied de page ---------- */
 .site-footer {

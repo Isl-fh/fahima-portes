@@ -323,3 +323,71 @@ html[dir="rtl"] .details li::before { content: "✦ "; }
 
 /* Masque le bouton WhatsApp flottant quand la modale de devis est ouverte */
 .fenetre.active ~ .wa-float { display: none; }
+
+/* ---------- Favoris et avis ---------- */
+.porte { position: relative; }
+.fav-btn {
+  position: absolute;
+  top: 10px;
+  inset-inline-end: 10px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  color: #fff;
+  background: rgba(8, 8, 8, .55);
+  cursor: pointer;
+  transition: transform .2s, background .2s, color .2s;
+}
+.fav-btn svg { width: 20px; height: 20px; }
+.fav-btn:hover { background: rgba(8, 8, 8, .8); }
+.fav-btn.actif { color: #e3262d; }
+.fav-btn.actif svg path { fill: currentColor; }
+html[dir="rtl"] .fav-btn { inset-inline-end: auto; inset-inline-start: 10px; }
+
+.avis-entree {
+  margin: -2px 0 8px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #80632b;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.avis-entree:hover { color: #9b7222; }
+.avis-entree .notes { color: #c9a24d; letter-spacing: 1px; }
+
+/* Fenêtre des avis */
+.fenetre-avis .formulaire { max-width: 620px; }
+.avis-item {
+  padding: 12px 0;
+  border-bottom: 1px solid #d8cbb0;
+  font-size: 14px;
+}
+.avis-item .etoiles { color: #c9a24d; letter-spacing: 2px; margin-bottom: 4px; }
+.avis-item .avis-texte { color: #3d3a34; }
+.avis-item footer { margin-top: 6px; color: #80632b; font-size: 12px; }
+.avis-item footer span { color: #8b8170; margin-inline-start: 8px; }
+.notes-choix { display: flex; gap: 6px; }
+.notes-choix button {
+  padding: 6px 10px;
+  border: 1px solid #d7c8a4;
+  border-radius: 4px;
+  color: #b9a26a;
+  background: #fff;
+  cursor: pointer;
+  font-size: 15px;
+  letter-spacing: 2px;
+  transition: color .15s, border-color .15s;
+}
+.notes-choix button:hover { border-color: #c9a24d; }
+.notes-choix button.choisi { color: #c9a24d; border-color: #c9a24d; }
+#avis-connect { cursor: pointer; }
+.chargement { color: #8b8170; }

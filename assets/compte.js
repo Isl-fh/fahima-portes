@@ -1,9 +1,9 @@
-/* Espace client FAHIMA PORTES — Firebase Authentication (e-mail ou téléphone + mot de passe) */
+/* Espace client FAHIMA PORTES — connexion, inscription et tableau de bord :
+   profil, demandes de devis, commandes, favoris et avis. */
 import { firebaseConfig, DOMAINE_TEL, TEL_ACTIF } from "./firebase-config.js";
+import { session, verifierAdmin } from "./session.js";
 
 // Inscription / connexion par téléphone (SMS) : désactivée dans cette version.
-// Pour l'activer plus tard : passer TEL_ACTIF à true dans firebase-config.js
-// puis tester l'envoi de code, la connexion et la récupération de compte.
 if (!TEL_ACTIF) {
   document.querySelectorAll('input[value="phone"]').forEach((r) => { r.disabled = true; });
   document.querySelectorAll(".par-phone").forEach((e) => { e.hidden = true; });
@@ -33,9 +33,11 @@ function montrer(id) {
   $("tab-login").setAttribute("aria-selected", String(id === "form-login"));
   $("tab-signup").setAttribute("aria-selected", String(id === "form-signup"));
 }
+
 document.querySelectorAll("[data-vue]").forEach((b) =>
   b.addEventListener("click", () => { message(null); montrer(b.dataset.vue === "signup" ? "form-signup" : "form-login"); })
 );
+
 document.querySelectorAll("[data-retour]").forEach((b) =>
   b.addEventListener("click", () => { message(null); montrer("form-login"); })
 );
@@ -78,9 +80,9 @@ if (!configure) {
   formulaires.forEach((f) => occupe(f, true));
 }
 
-// ---------- Firebase ----------
+// ---------- Firebase (via session.js, partagé avec les autres pages) ----------
 let fb = null;
-let fstore = null; // module Firestore (lien administration)
+let fstore = null;
 let auth = null;
 let db = null;
 let confirmation = null;
@@ -101,18 +103,18 @@ function codeErreur(e) {
 }
 
 function memoriser(user) {
+  if (!window.FH) return;
   if (!user) { FH.ecrire("fh-user", "null"); return; }
   const [prenom, ...reste] = (user.displayName || "").split(" ");
   const vraiEmail = user.email && !user.email.endsWith("@" + DOMAINE_TEL) ? user.email : "";
   FH.ecrire("fh-user", JSON.stringify({ prenom, nom: reste.join(" "), email: vraiEmail, telephone: user.phoneNumber || "" }));
-  FH.appliquer();
 }
 
 function afficherTableau(user) {
   window.__fhUser = user;
   $("vue-auth").hidden = !!user;
   $("vue-dash").hidden = !user;
-  verifierAdmin(user);
+  verifierAdmin(user).then((r) => { const el = $("dash-admin"); if (el) el.hidden = !r.admin; });
   if (!user) return;
   const prenom = (user.displayName || "").split(" ")[0] || "";
   $("dash-titre").textContent = t("acc.welcome", { name: prenom }).trim();
@@ -122,39 +124,22 @@ function afficherTableau(user) {
   $("dash-statut").textContent = t(verifie ? "acc.verified" : "acc.unverified");
   $("dash-statut").className = verifie ? "verifie" : "attente";
   $("dash-verif").hidden = verifie;
+  chargerTableauDeBord(user);
 }
 
 async function demarrer() {
   if (!configure) return;
-  const v = "10.12.2";
-  const [{ initializeApp }, A, F] = await Promise.all([
-    import(`https://www.gstatic.com/firebasejs/${v}/firebase-app.js`),
-    import(`https://www.gstatic.com/firebasejs/${v}/firebase-auth.js`),
-    import(`https://www.gstatic.com/firebasejs/${v}/firebase-firestore.js`)
-  ]);
-  fb = A;
-  fstore = F;
-  const application = initializeApp(firebaseConfig);
-  db = F.getFirestore(application);
-  auth = A.getAuth(application);
-  auth.languageCode = FH.etat.lang;
-  document.addEventListener("fh:change", () => (auth.languageCode = FH.etat.lang));
-  A.onAuthStateChanged(auth, (user) => {
-    if (user && modeCode) return; // inscription par téléphone en cours
-    memoriser(user);
-    afficherTableau(user);
+  await session.quand;
+  fb = session.fb;
+  fstore = session.fstore;
+  auth = session.auth;
+  db = session.db;
+  // La page réagit aux changements de connexion diffusés par session.js.
+  document.addEventListener("fh:user", function (e) {
+    if (e.detail.user && modeCode) return; // inscription par téléphone en cours
+    afficherTableau(e.detail.user);
   });
-}
-
-// Affiche le lien d'administration si le compte figure dans la collection « admins »
-async function verifierAdmin(user) {
-  var el = $("dash-admin");
-  if (!el) return;
-  if (!user || !db || !fstore || !configure) { el.hidden = true; return; }
-  try {
-    var s = await fstore.getDoc(fstore.doc(db, "admins", user.uid));
-    el.hidden = !s.exists();
-  } catch (e) { el.hidden = true; }
+  if (session.user) afficherTableau(session.user);
 }
 
 let verificateur = null;
@@ -197,6 +182,7 @@ $("form-login").addEventListener("submit", async (e) => {
     await persistance();
     const r = await fb.signInWithEmailAndPassword(auth, identifiant, pw);
     message(r.user.phoneNumber || r.user.emailVerified ? null : "err.notverified", null, "info");
+    afficherTableau(r.user);
     window.location.href = "index.html";
     return;
   } catch (err) {
@@ -233,8 +219,6 @@ $("form-signup").addEventListener("submit", async (e) => {
       memoriser(r.user);
       afficherTableau(r.user);
       message("acc.email.sent", { email }, "ok");
-      window.location.href = "index.html";
-      return;
     }
   } catch (err) {
     message(codeErreur(err));
@@ -322,5 +306,238 @@ $("btn-check").addEventListener("click", async () => {
   afficherTableau(auth.currentUser);
   message(auth.currentUser.emailVerified ? null : "err.notverified", null, "info");
 });
+
+// Onglets du tableau de bord
+document.querySelectorAll("[data-dash]").forEach((b) =>
+  b.addEventListener("click", () => {
+    document.querySelectorAll("[data-dash]").forEach((x) => x.classList.toggle("actif", x === b));
+    ["profil", "devis", "commandes", "favoris", "avis"].forEach((k) => {
+      $("dash-" + k).hidden = k !== b.dataset.dash;
+    });
+  })
+);
+
+function esc(s) { const d = document.createElement("div"); d.textContent = s == null ? "" : String(s); return d.innerHTML; }
+function dateCourte(ts) {
+  if (!ts || !ts.seconds) return "";
+  return new Date(ts.seconds * 1000).toLocaleDateString(FH.etat.lang === "ar" ? "ar" : FH.etat.lang);
+}
+function badgeStatut(statut) {
+  const txt = FH.t("statut." + statut);
+  const classes = { nouveau: "b-nouveau", "en-cours": "b-cours", traite: "b-ok" };
+  return '<span class="badge-statut ' + (classes[statut] || "") + '">' + esc(txt) + "</span>";
+}
+function badgeCommande(statut) {
+  const cle = "statut.c." + statut;
+  const txt = FH.t(cle);
+  const classes = { "en-cours": "b-cours", expediee: "b-info", installee: "b-ok" };
+  return '<span class="badge-statut ' + (classes[statut] || "") + '">' + esc(txt) + "</span>";
+}
+
+async function chargerTableauDeBord(user) {
+  chargerProfil(user);
+  chargerDevis(user);
+  chargerCommandes(user);
+  chargerFavoris(user);
+  chargerMesAvis(user);
+}
+
+// -- Profil --
+async function chargerProfil(user) {
+  const complet = (user.displayName || "").split(" ");
+  $("pr-prenom").value = complet[0] || "";
+  $("pr-nom").value = complet.slice(1).join(" ");
+  $("pr-tel").value = "";
+  if (!fstore || !db) return;
+  try {
+    const s = await fstore.getDoc(fstore.doc(db, "users", user.uid));
+    if (s.exists()) {
+      const d = s.data() || {};
+      if (d.prenom) $("pr-prenom").value = d.prenom;
+      if (d.nom != null) $("pr-nom").value = d.nom || "";
+      if (d.telephone) $("pr-tel").value = d.telephone;
+    }
+  } catch (e) { /* profil absent : les champs Firebase servent de secours */ }
+}
+
+$("form-profil").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const user = session.user;
+  if (!user || !fstore || !db) return;
+  const prenom = $("pr-prenom").value.trim().slice(0, 60);
+  const nom = $("pr-nom").value.trim().slice(0, 60);
+  const tel = $("pr-tel").value.trim().slice(0, 30);
+  try {
+    const vraiEmail = user.email && !user.email.endsWith("@" + DOMAINE_TEL) ? user.email : "";
+    await fstore.setDoc(fstore.doc(db, "users", user.uid), {
+      prenom, nom, email: vraiEmail, telephone: tel
+    });
+    await fb.updateProfile(user, { displayName: (prenom + " " + nom).trim() });
+    await user.reload();
+    afficherTableau(session.auth.currentUser);
+    message("acc.profil.ok", null, "ok");
+  } catch (err) {
+    message(codeErreur(err));
+  }
+});
+
+// -- Changement de mot de passe (avec reconnexion) --
+$("form-pw").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const user = session.user;
+  if (!user || !fb) return;
+  const actuel = $("pw-actuel").value;
+  const nouveau = $("pw-nouveau").value;
+  if (nouveau.length < 8) return message("err.pwshort");
+  occupe("form-pw", true);
+  try {
+    const identifiant = user.email && !user.email.endsWith("@" + DOMAINE_TEL)
+      ? user.email : emailTel(user.phoneNumber || "");
+    const cred = fb.EmailAuthProvider.credential(identifiant, actuel);
+    await fb.reauthenticateWithCredential(user, cred);
+    await fb.updatePassword(user, nouveau);
+    $("pw-actuel").value = "";
+    $("pw-nouveau").value = "";
+    message("acc.pw.ok", null, "ok");
+  } catch (err) {
+    message(codeErreur(err));
+  } finally {
+    occupe("form-pw", false);
+  }
+});
+
+// -- Mes demandes de devis --
+async function chargerDevis(user) {
+  const zone = $("liste-devis");
+  zone.innerHTML = "";
+  if (!fstore || !db) return;
+  try {
+    const snap = await fstore.getDocs(
+      fstore.query(fstore.collection(db, "devis"), fstore.where("uid", "==", user.uid))
+    );
+    const liste = snap.docs.map((d) => Object.assign({ id: d.id }, d.data()))
+      .sort((a, b) => (b.date && b.date.seconds || 0) - (a.date && a.date.seconds || 0));
+    if (!liste.length) { zone.innerHTML = '<p class="vide-dash">' + esc(FH.t("acc.dash.devis.vide")) + "</p>"; return; }
+    liste.forEach((v) => {
+      const art = document.createElement("article");
+      art.className = "ligne-dash";
+      art.innerHTML =
+        '<div class="infos-ligne"><p class="nom-ligne">' + esc(v.produit || "") + "</p>" +
+        '<p class="details-ligne">' + esc(dateCourte(v.date)) + " · " + badgeStatut(v.statut || "nouveau") + "</p>" +
+        (v.message ? '<p class="msg-ligne">' + esc(v.message) + "</p>" : "") + "</div>" +
+        '<div class="actions-ligne"><button type="button" class="secondaire btn-mini" data-annuler="' + esc(v.id) + '">' + esc(FH.t("acc.devis.annuler")) + "</button></div>";
+      art.querySelector("[data-annuler]").addEventListener("click", async function () {
+        if (!confirm("Annuler cette demande de devis ?")) return;
+        try { await fstore.deleteDoc(fstore.doc(db, "devis", v.id)); chargerDevis(user); }
+        catch (err) { message(codeErreur(err)); }
+      });
+      zone.appendChild(art);
+    });
+  } catch (e) { zone.innerHTML = ""; }
+}
+
+// -- Mes commandes --
+async function chargerCommandes(user) {
+  const zone = $("liste-commandes");
+  zone.innerHTML = "";
+  const email = (user.email || "").toLowerCase();
+  if (!fstore || !db || !email || email.endsWith("@" + DOMAINE_TEL)) {
+    zone.innerHTML = '<p class="vide-dash">' + esc(FH.t("acc.dash.commandes.vide")) + "</p>";
+    return;
+  }
+  try {
+    const snap = await fstore.getDocs(
+      fstore.query(fstore.collection(db, "commandes"), fstore.where("clientEmail", "==", email))
+    );
+    const liste = snap.docs.map((d) => Object.assign({ id: d.id }, d.data()))
+      .sort((a, b) => (b.date && b.date.seconds || 0) - (a.date && a.date.seconds || 0));
+    if (!liste.length) { zone.innerHTML = '<p class="vide-dash">' + esc(FH.t("acc.dash.commandes.vide")) + "</p>"; return; }
+    liste.forEach((v) => {
+      const art = document.createElement("article");
+      art.className = "ligne-dash";
+      art.innerHTML =
+        '<div class="infos-ligne"><p class="nom-ligne">' + esc(v.produit || "") + "</p>" +
+        '<p class="details-ligne">' + esc(dateCourte(v.date)) + " · " + badgeCommande(v.statut || "en-cours") + "</p>" +
+        (v.notes ? '<p class="msg-ligne">' + esc(v.notes) + "</p>" : "") + "</div>";
+      zone.appendChild(art);
+    });
+  } catch (e) { zone.innerHTML = ""; }
+}
+
+// -- Mes favoris --
+async function chargerFavoris(user) {
+  const zone = $("liste-favoris");
+  zone.innerHTML = "";
+  if (!fstore || !db) return;
+  try {
+    const snap = await fstore.getDocs(fstore.collection(db, "users", user.uid, "favoris"));
+    if (!snap.size) { zone.innerHTML = '<p class="vide-dash">' + esc(FH.t("acc.dash.favoris.vide")) + "</p>"; return; }
+    for (const d of snap.docs) {
+      const p = await fstore.getDoc(fstore.doc(db, "products", d.id)).catch(() => null);
+      const donnees = p && p.exists() ? p.data() : null;
+      const art = document.createElement("article");
+      art.className = "ligne-dash favori-ligne";
+      if (donnees && donnees.img) {
+        const img = document.createElement("img");
+        img.src = donnees.img;
+        img.alt = "";
+        img.loading = "lazy";
+        art.appendChild(img);
+      }
+      const infos = document.createElement("div");
+      infos.className = "infos-ligne";
+      const x = donnees ? (donnees[FH.etat.lang] || donnees.fr || {}) : {};
+      infos.innerHTML =
+        '<p class="nom-ligne">' + esc((x && x.n) || d.id) + "</p>" +
+        '<p class="details-ligne">' + (donnees ? esc(FH.prix(donnees.eur)) : "") + "</p>";
+      const actions = document.createElement("div");
+      actions.className = "actions-ligne";
+      const lien = document.createElement("a");
+      lien.className = "secondaire btn-mini";
+      lien.href = "catalogue.html";
+      lien.textContent = FH.t("acc.fav.voir");
+      actions.appendChild(lien);
+      art.appendChild(infos);
+      art.appendChild(actions);
+      zone.appendChild(art);
+    }
+  } catch (e) { zone.innerHTML = ""; }
+}
+
+// -- Mes avis --
+async function chargerMesAvis(user) {
+  const zone = $("liste-mes-avis");
+  zone.innerHTML = "";
+  if (!fstore || !db) return;
+  try {
+    const snap = await fstore.getDocs(
+      fstore.query(fstore.collection(db, "avis"), fstore.where("uid", "==", user.uid))
+    );
+    const liste = snap.docs.map((d) => Object.assign({ id: d.id }, d.data()))
+      .sort((a, b) => (b.date && b.date.seconds || 0) - (a.date && a.date.seconds || 0));
+    if (!liste.length) { zone.innerHTML = '<p class="vide-dash">' + esc(FH.t("acc.dash.avis.vide")) + "</p>"; return; }
+    for (const v of liste) {
+      let nomProduit = v.produit || "";
+      try {
+        const p = await fstore.getDoc(fstore.doc(db, "products", v.produit));
+        if (p.exists()) nomProduit = (p.data()[FH.etat.lang] || p.data().fr || {}).n || nomProduit;
+      } catch (e) {}
+      const art = document.createElement("article");
+      art.className = "ligne-dash";
+      const pleines = "★★★★★".slice(0, v.note || 0) + "☆☆☆☆☆".slice(0, 5 - (v.note || 0));
+      art.innerHTML =
+        '<div class="infos-ligne"><p class="nom-ligne">' + esc(nomProduit) + ' <span class="notes">' + pleines + "</span></p>" +
+        '<p class="msg-ligne">' + esc(v.texte || "") + "</p>" +
+        '<p class="details-ligne">' + esc(dateCourte(v.date)) + "</p></div>" +
+        '<div class="actions-ligne"><button type="button" class="secondaire btn-mini" data-suppr="' + esc(v.id) + '">' + esc(FH.t("avis.supprimer")) + "</button></div>";
+      art.querySelector("[data-suppr]").addEventListener("click", async function () {
+        if (!confirm("Supprimer cet avis ?")) return;
+        try { await fstore.deleteDoc(fstore.doc(db, "avis", v.id)); chargerMesAvis(user); }
+        catch (err) { message(codeErreur(err)); }
+      });
+      zone.appendChild(art);
+    }
+  } catch (e) { zone.innerHTML = ""; }
+}
 
 demarrer().catch((e) => { console.error(e); message("err.generic"); });

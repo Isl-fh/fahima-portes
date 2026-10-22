@@ -1,5 +1,7 @@
-/* Administration FAHIMA PORTES — connexion sécurisée + gestion du catalogue (Firestore) */
+/* Administration FAHIMA PORTES — connexion sécurisée + gestion du catalogue,
+   des demandes de devis, des commandes et des avis clients (Firestore). */
 import { firebaseConfig } from "./firebase-config.js";
+import { session, verifierAdmin } from "./session.js";
 import { PRODUITS_INITIAUX } from "./produits-initiaux.js";
 
 const $ = (id) => document.getElementById(id);
@@ -12,9 +14,14 @@ let db = null;
 let utilisateur = null;
 let produits = [];
 let editionId = null; // null = création d'une offre
-let arreterEcoute = null; // désabonnement de l'écoute Firestore
+let arreterEcouteProduits = null;
+let arreterEcouteDevis = null;
+let arreterEcouteCommandes = null;
+let arreterEcouteAvis = null;
 
-const TYPES = ["blindee", "fer-forge", "simple", "double", "chambre", "salon"];
+const TYPES = ["blindee", "fer-forge", "simple", "double", "extra-large", "chambre", "salon"];
+const STATUTS_DEVIS = ["nouveau", "en-cours", "traite"];
+const STATUTS_COMMANDE = ["en-cours", "expediee", "installee"];
 
 function esc(s) { const d = document.createElement("div"); d.textContent = s == null ? "" : String(s); return d.innerHTML; }
 function montrerVue(id) {
@@ -27,54 +34,52 @@ function message(txt, type) {
   el.className = "alerte" + (type ? " " + type : "");
   el.hidden = false;
 }
+function dateCourte(ts) {
+  if (!ts || !ts.seconds) return "";
+  return new Date(ts.seconds * 1000).toLocaleString("fr-FR", { dateStyle: "short", timeStyle: "short" });
+}
 
 async function demarrer() {
   if (!configure) { montrerVue("vue-hors-service"); return; }
-  const v = "10.12.2";
-  const [{ initializeApp }, A, F] = await Promise.all([
-    import(`https://www.gstatic.com/firebasejs/${v}/firebase-app.js`),
-    import(`https://www.gstatic.com/firebasejs/${v}/firebase-auth.js`),
-    import(`https://www.gstatic.com/firebasejs/${v}/firebase-firestore.js`)
-  ]);
-  fb = A; fstore = F;
-  const app = initializeApp(firebaseConfig);
-  auth = A.getAuth(app);
-  db = F.getFirestore(app);
-  A.onAuthStateChanged(auth, gererUtilisateur);
+  await session.quand;
+  fb = session.fb;
+  fstore = session.fstore;
+  auth = session.auth;
+  db = session.db;
+  fb.onAuthStateChanged(auth, gererUtilisateur);
 }
 
 async function gererUtilisateur(u) {
   utilisateur = u;
-  arreterEcouteCatalogue();
+  arreterTout();
   produits = [];
   fermerFormulaire();
   $("btn-importer").hidden = true;
-  if (!u) { montrerVue("vue-connexion"); return; }
-  let admin = false;
-  let erreurVerif = null;
+  if (!u) { montrerVue("vue-connexion"); infoConnexion(null); return; }
   montrerVue("vue-connexion");
   infoConnexion("Connecté. Vérification des droits administrateur…", false);
-  try {
-    const s = await Promise.race([
-      fstore.getDoc(fstore.doc(db, "admins", u.uid)),
-      new Promise((_, rej) => setTimeout(() => rej(new Error("délai dépassé (10 s) : la base de données ne répond pas")), 10000))
-    ]);
-    admin = s.exists();
-  } catch (e) { admin = false; erreurVerif = e; }
+  const r = await verifierAdmin(u);
   if (u !== utilisateur) return; // l'utilisateur a changé pendant la vérification
-  if (erreurVerif) {
-    infoConnexion("Vérification impossible : " + (erreurVerif.code || "") + " " + erreurVerif.message, true);
+  if (r.erreur) {
+    infoConnexion("Vérification impossible (" + ((r.erreur && r.erreur.code) || r.erreur.message || "") + "). " +
+      "Si l'erreur persiste, publiez les dernières règles de sécurité dans Firebase (voir GUIDE-ADMIN.md).", true);
     return;
   }
   infoConnexion(null);
-  if (!admin) { montrerVue("vue-refuse"); return; }
+  if (!r.admin) { montrerVue("vue-refuse"); return; }
   $("admin-email-affiche").textContent = u.email || u.phoneNumber || "";
   montrerVue("vue-admin");
   ecouterProduits();
+  ecouterDevis();
+  ecouterCommandes();
+  ecouterAvis();
 }
 
-function arreterEcouteCatalogue() {
-  if (arreterEcoute) { try { arreterEcoute(); } catch (e) {} arreterEcoute = null; }
+function arreterTout() {
+  [arreterEcouteProduits, arreterEcouteDevis, arreterEcouteCommandes, arreterEcouteAvis].forEach((f) => {
+    if (f) { try { f(); } catch (e) {} }
+  });
+  arreterEcouteProduits = arreterEcouteDevis = arreterEcouteCommandes = arreterEcouteAvis = null;
 }
 
 function infoConnexion(txt, erreur) {
@@ -82,6 +87,7 @@ function infoConnexion(txt, erreur) {
   if (!txt) { m.hidden = true; return; }
   m.textContent = txt;
   m.hidden = false;
+  m.className = "alerte" + (erreur ? "" : " info");
 }
 
 // ---------- Connexion ----------
@@ -106,8 +112,8 @@ $("btn-refuse-logout").addEventListener("click", () => auth && fb.signOut(auth))
 
 // ---------- Lecture du catalogue ----------
 function ecouterProduits() {
-  arreterEcouteCatalogue();
-  arreterEcoute = fstore.onSnapshot(
+  arreterEcouteProduits && arreterEcouteProduits();
+  arreterEcouteProduits = fstore.onSnapshot(
     fstore.query(fstore.collection(db, "products"), fstore.orderBy("ordre")),
     (snap) => {
       produits = snap.docs.map((d) => Object.assign({ id: d.id }, d.data()));
@@ -131,14 +137,14 @@ function rendreListe() {
     const typesTxt = (p.types || []).join(", ");
     ligne.innerHTML =
       '<img alt="" loading="lazy">' +
-      '<div class="infos-ligne"><p class="nom-ligne">' + esc((p.fr && p.fr.n) || p.id) + '</p>' +
-      '<p class="details-ligne">' + esc(Number(p.eur).toFixed(2)) + ' € · ' + esc(typesTxt) +
-      (p.visible ? "" : ' · <span class="cache">masquée</span>') + '</p></div>' +
+      '<div class="infos-ligne"><p class="nom-ligne">' + esc((p.fr && p.fr.n) || p.id) + "</p>" +
+      '<p class="details-ligne">' + esc(Number(p.eur).toFixed(2)) + " € · " + esc(typesTxt) +
+      (p.visible ? "" : ' · <span class="cache">masquée</span>') + "</p></div>" +
       '<div class="actions-ligne">' +
       '<button type="button" class="secondaire btn-mini" data-act="modifier">Modifier</button>' +
-      '<button type="button" class="secondaire btn-mini" data-act="visible">' + (p.visible ? "Masquer" : "Afficher") + '</button>' +
+      '<button type="button" class="secondaire btn-mini" data-act="visible">' + (p.visible ? "Masquer" : "Afficher") + "</button>" +
       '<button type="button" class="secondaire btn-mini danger" data-act="supprimer">Supprimer</button>' +
-      '</div>';
+      "</div>";
     const image = ligne.querySelector("img");
     image.src = p.img; // affectation directe : jamais insérée dans du HTML
     image.onerror = function () { image.style.visibility = "hidden"; };
@@ -165,13 +171,13 @@ async function actionLigne(acte, p) {
   }
 }
 
-// ---------- Formulaire ----------
+// ---------- Formulaire produit ----------
 $("btn-ajouter").addEventListener("click", () => ouvrirFormulaire(null));
 $("btn-annuler").addEventListener("click", fermerFormulaire);
 
 function ouvrirFormulaire(p) {
   editionId = p ? p.id : null;
-  $("form-titre").textContent = p ? 'Modifier : ' + ((p.fr && p.fr.n) || p.id) : "Nouvelle offre";
+  $("form-titre").textContent = p ? "Modifier : " + ((p.fr && p.fr.n) || p.id) : "Nouvelle offre";
   const d = p || {};
   const x = (l) => (d[l] || d.fr || {});
   $("p-nom-fr").value = (d.fr && d.fr.n) || "";
@@ -284,6 +290,171 @@ $("btn-importer").addEventListener("click", async () => {
     message("Import impossible : " + err.message);
   }
 });
+
+// ---------- Demandes de devis ----------
+function ecouterDevis() {
+  arreterEcouteDevis && arreterEcouteDevis();
+  arreterEcouteDevis = fstore.onSnapshot(
+    fstore.query(fstore.collection(db, "devis"), fstore.orderBy("date", "desc")),
+    (snap) => rendreDevis(snap.docs.map((d) => Object.assign({ id: d.id }, d.data()))),
+    (err) => console.warn("Devis indisponibles.", err)
+  );
+}
+
+function rendreDevis(liste) {
+  const zone = $("liste-devis");
+  zone.innerHTML = "";
+  if (!liste.length) {
+    zone.innerHTML = '<p class="alerte info">Aucune demande de devis pour le moment.</p>';
+    return;
+  }
+  liste.forEach((v) => {
+    const ligne = document.createElement("div");
+    ligne.className = "ligne-produit ligne-large";
+    ligne.innerHTML =
+      '<div class="infos-ligne"><p class="nom-ligne">' + esc(v.nom || "") + " · " + esc(v.produit || "") + "</p>" +
+      '<p class="details-ligne">' + esc(dateCourte(v.date)) + " · " + esc(v.telephone || "") + " · " + esc(v.email || "") + "</p>" +
+      (v.message ? '<p class="msg-ligne">' + esc(v.message) + "</p>" : "") + "</div>" +
+      '<div class="actions-ligne">' +
+      '<select class="select-statut" aria-label="Statut">' +
+      STATUTS_DEVIS.map((s) => '<option value="' + s + '"' + (v.statut === s ? " selected" : "") + ">" + s + "</option>").join("") +
+      "</select>" +
+      '<button type="button" class="secondaire btn-mini danger" data-act="supprimer-devis">Supprimer</button>' +
+      "</div>";
+    ligne.querySelector("select").addEventListener("change", async (e) => {
+      try {
+        await fstore.updateDoc(fstore.doc(db, "devis", v.id), { statut: e.target.value });
+        message("Statut mis à jour.", "ok");
+      } catch (err) { message("Modification impossible : " + err.message); }
+    });
+    ligne.querySelector("[data-act='supprimer-devis']").addEventListener("click", async () => {
+      if (!confirm("Supprimer cette demande de devis ?")) return;
+      try { await fstore.deleteDoc(fstore.doc(db, "devis", v.id)); message(null); }
+      catch (err) { message("Suppression impossible : " + err.message); }
+    });
+    zone.appendChild(ligne);
+  });
+}
+
+// ---------- Commandes ----------
+function ecouterCommandes() {
+  arreterEcouteCommandes && arreterEcouteCommandes();
+  arreterEcouteCommandes = fstore.onSnapshot(
+    fstore.query(fstore.collection(db, "commandes"), fstore.orderBy("date", "desc")),
+    (snap) => rendreCommandes(snap.docs.map((d) => Object.assign({ id: d.id }, d.data()))),
+    (err) => console.warn("Commandes indisponibles.", err)
+  );
+}
+
+function rendreCommandes(liste) {
+  const zone = $("liste-commandes");
+  zone.innerHTML = "";
+  if (!liste.length) {
+    zone.innerHTML = '<p class="alerte info">Aucune commande pour le moment. Créez une commande pour un client avec « + Nouvelle commande ».</p>';
+    return;
+  }
+  liste.forEach((v) => {
+    const ligne = document.createElement("div");
+    ligne.className = "ligne-produit ligne-large";
+    ligne.innerHTML =
+      '<div class="infos-ligne"><p class="nom-ligne">' + esc(v.produit || "") + " · " + esc(v.clientEmail || "") + "</p>" +
+      '<p class="details-ligne">' + esc(dateCourte(v.date)) + (v.prix ? " · " + esc(Number(v.prix).toFixed(2)) + " €" : "") + "</p>" +
+      (v.notes ? '<p class="msg-ligne">' + esc(v.notes) + "</p>" : "") + "</div>" +
+      '<div class="actions-ligne">' +
+      '<select class="select-statut" aria-label="Statut">' +
+      STATUTS_COMMANDE.map((s) => '<option value="' + s + '"' + (v.statut === s ? " selected" : "") + ">" + s + "</option>").join("") +
+      "</select>" +
+      '<button type="button" class="secondaire btn-mini danger" data-act="supprimer-commande">Supprimer</button>' +
+      "</div>";
+    ligne.querySelector("select").addEventListener("change", async (e) => {
+      try {
+        await fstore.updateDoc(fstore.doc(db, "commandes", v.id), { statut: e.target.value });
+        message("Statut mis à jour.", "ok");
+      } catch (err) { message("Modification impossible : " + err.message); }
+    });
+    ligne.querySelector("[data-act='supprimer-commande']").addEventListener("click", async () => {
+      if (!confirm("Supprimer cette commande ?")) return;
+      try { await fstore.deleteDoc(fstore.doc(db, "commandes", v.id)); message(null); }
+      catch (err) { message("Suppression impossible : " + err.message); }
+    });
+    zone.appendChild(ligne);
+  });
+}
+
+$("btn-commande").addEventListener("click", () => {
+  $("form-commande").hidden = false;
+  $("form-commande").scrollIntoView({ behavior: "smooth", block: "start" });
+});
+$("btn-commande-annuler").addEventListener("click", () => { $("form-commande").hidden = true; });
+
+$("form-commande").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  if (!db) return;
+  const email = $("c-email").value.trim().toLowerCase();
+  const produit = $("c-produit").value.trim();
+  const prix = Number($("c-prix").value);
+  const notes = $("c-notes").value.trim();
+  const statut = $("c-statut").value;
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return message("Indiquez l'adresse e-mail du client (celle de son compte).");
+  if (!produit) return message("Indiquez le produit commandé.");
+  try {
+    await fstore.addDoc(fstore.collection(db, "commandes"), {
+      clientEmail: email,
+      produit: produit.slice(0, 80),
+      prix: prix > 0 ? prix : 0,
+      notes: notes.slice(0, 500),
+      statut,
+      date: fstore.serverTimestamp()
+    });
+    message("Commande créée. Elle apparaît dans l'espace client associé à cette adresse e-mail.", "ok");
+    $("form-commande").reset();
+    $("form-commande").hidden = true;
+  } catch (err) {
+    message("Création impossible : " + err.message);
+  }
+});
+
+// ---------- Avis clients ----------
+function ecouterAvis() {
+  arreterEcouteAvis && arreterEcouteAvis();
+  arreterEcouteAvis = fstore.onSnapshot(
+    fstore.query(fstore.collection(db, "avis"), fstore.orderBy("date", "desc")),
+    (snap) => rendreAvis(snap.docs.map((d) => Object.assign({ id: d.id }, d.data()))),
+    (err) => console.warn("Avis indisponibles.", err)
+  );
+}
+
+function rendreAvis(liste) {
+  const zone = $("liste-avis");
+  zone.innerHTML = "";
+  if (!liste.length) {
+    zone.innerHTML = '<p class="alerte info">Aucun avis client pour le moment.</p>';
+    return;
+  }
+  liste.forEach((v) => {
+    const pleines = "★★★★★".slice(0, v.note || 0) + "☆☆☆☆☆".slice(0, 5 - (v.note || 0));
+    const ligne = document.createElement("div");
+    ligne.className = "ligne-produit ligne-large";
+    ligne.innerHTML =
+      '<div class="infos-ligne"><p class="nom-ligne">' + esc(v.produit || "") + ' <span class="etoiles-admin">' + pleines + "</span></p>" +
+      '<p class="details-ligne">' + esc(v.nom || "") + " · " + esc(dateCourte(v.date)) + (v.visible ? "" : " · masqué") + "</p>" +
+      '<p class="msg-ligne">' + esc(v.texte || "") + "</p></div>" +
+      '<div class="actions-ligne">' +
+      '<button type="button" class="secondaire btn-mini" data-act="basculer-avis">' + (v.visible ? "Masquer" : "Afficher") + "</button>" +
+      '<button type="button" class="secondaire btn-mini danger" data-act="supprimer-avis">Supprimer</button>' +
+      "</div>";
+    ligne.querySelector("[data-act='basculer-avis']").addEventListener("click", async () => {
+      try { await fstore.updateDoc(fstore.doc(db, "avis", v.id), { visible: !v.visible }); message(null); }
+      catch (err) { message("Modification impossible : " + err.message); }
+    });
+    ligne.querySelector("[data-act='supprimer-avis']").addEventListener("click", async () => {
+      if (!confirm("Supprimer cet avis ?")) return;
+      try { await fstore.deleteDoc(fstore.doc(db, "avis", v.id)); message(null); }
+      catch (err) { message("Suppression impossible : " + err.message); }
+    });
+    zone.appendChild(ligne);
+  });
+}
 
 demarrer().catch((e) => {
   console.error(e);

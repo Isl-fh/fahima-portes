@@ -70,6 +70,7 @@
                     <option value="fer-forge" data-i18n="type.fer-forge">Fer forgé</option>
                     <option value="simple" data-i18n="type.simple">Porte simple</option>
                     <option value="double" data-i18n="type.double">Porte double</option>
+                    <option value="extra-large" data-i18n="type.extra-large">Porte extra large</option>
                     <option value="chambre" data-i18n="type.chambre">Porte de chambre</option>
                     <option value="salon" data-i18n="type.salon">Porte de salon</option>
                 </select>
@@ -121,6 +122,33 @@
             <button class="envoyer wa" type="button" id="envoyer-wa" data-i18n="form.sendwa"></button>
             <p class="note" data-i18n="form.note"></p>
         </form>
+    </div>
+
+    <!-- Fenêtre des avis clients -->
+    <div class="fenetre fenetre-avis" id="fenetre-avis" role="dialog" aria-modal="true" aria-labelledby="avis-titre">
+        <div class="formulaire">
+            <button class="fermer" id="fermer-avis" type="button" aria-label="×">&times;</button>
+            <h2 id="avis-titre"><span data-i18n="avis.titre"></span> — <span id="avis-produit"></span></h2>
+            <div id="avis-liste"></div>
+            <form id="form-avis" novalidate>
+                <p class="prefill" id="avis-connect" data-i18n="avis.connect"></p>
+                <div class="champ">
+                    <label data-i18n="avis.note">Votre note</label>
+                    <div class="notes-choix" id="notes-choix" dir="ltr">
+                        <button type="button" data-note="1" aria-label="1">★</button>
+                        <button type="button" data-note="2" aria-label="2">★★</button>
+                        <button type="button" data-note="3" aria-label="3">★★★</button>
+                        <button type="button" data-note="4" aria-label="4">★★★★</button>
+                        <button type="button" data-note="5" aria-label="5">★★★★★</button>
+                    </div>
+                </div>
+                <div class="champ">
+                    <label for="avis-texte" data-i18n="avis.commentaire">Votre commentaire</label>
+                    <textarea id="avis-texte" rows="3" maxlength="400"></textarea>
+                </div>
+                <button class="envoyer" type="submit" data-i18n="avis.envoyer">Envoyer mon avis</button>
+            </form>
+        </div>
     </div>
 
     <footer class="site-footer">
