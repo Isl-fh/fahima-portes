@@ -423,16 +423,20 @@ import { session } from "./session.js?v=20261024";
         var snap = await F.getDocs(F.query(F.collection(session.db, "products"), F.where("visible", "==", true)));
         PRODUITS = snap.docs.map(function (d) { return Object.assign({ id: d.id }, d.data()); })
           .sort(function (a, b) { return (a.ordre || 999) - (b.ordre || 999); });
-        /* APERÇU — renommages appliqués côté navigateur en attendant la mise à jour
-           des documents Firestore (products/double, products/signature, products/prestige).
-           À SUPPRIMER une fois ces documents mis à jour dans Firebase (après publication
-           des règles de sécurité). Les données réelles ne sont pas modifiées ici. */
-        var RENOMMAGES_APERCU = { double: true, signature: true, prestige: true };
-        PRODUITS.forEach(function (p) {
-          if (RENOMMAGES_APERCU[p.id]) {
-            PRODUITS_INITIAUX.forEach(function (s) { if (s.id === p.id) Object.assign(p, s); });
-          }
-        });
+        /* APERÇU UNIQUEMENT (site d'aperçu) — renommages appliqués côté navigateur
+           en attendant la mise à jour des documents Firestore (products/double,
+           products/signature, products/prestige). Seuls les libellés et catégories
+           sont remplacés (jamais prix ni photo). À SUPPRIMER une fois ces documents
+           mis à jour dans Firebase. Les données réelles ne sont pas modifiées ici. */
+        if (location.hostname.indexOf("sites.pplx.app") > -1) {
+          PRODUITS.forEach(function (p) {
+            if (p.id === "double" || p.id === "signature" || p.id === "prestige") {
+              PRODUITS_INITIAUX.forEach(function (s) {
+                if (s.id === p.id) { p.types = s.types; p.fr = s.fr; p.ar = s.ar; p.en = s.en; }
+              });
+            }
+          });
+        }
         etatCatalogue = "pret";
         rendre();
         majInfoCatalogue();

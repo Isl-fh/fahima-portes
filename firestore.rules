@@ -130,6 +130,7 @@ service cloud.firestore {
     match /commandes/{id} {
       allow read: if estAdmin()
         || (request.auth != null && request.auth.token.email != null
+            && request.auth.token.email_verified == true
             && resource.data.clientEmail == request.auth.token.email.lower());
       allow create: if estAdmin()
         && request.resource.data.keys().hasOnly(['clientEmail', 'produit', 'prix', 'notes', 'statut', 'date'])
