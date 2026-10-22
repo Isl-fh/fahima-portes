@@ -185,8 +185,7 @@ $("form-login").addEventListener("submit", async (e) => {
     await persistance();
     const r = await fb.signInWithEmailAndPassword(auth, identifiant, pw);
     message(r.user.phoneNumber || r.user.emailVerified ? null : "err.notverified", null, "info");
-    afficherTableau(r.user);
-    window.location.href = "index.html";
+    afficherTableau(r.user); // reste sur la page : le tableau de bord s'affiche directement
     return;
   } catch (err) {
     message(codeErreur(err));
