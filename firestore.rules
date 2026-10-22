@@ -1,0 +1,51 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Un administrateur est un compte dont l'UID figure dans la collection « admins ».
+    function estAdmin() {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    // Catalogue : offres du site.
+    // - Lecture publique limitée aux offres visibles (la page catalogue interroge avec visible == true).
+    // - Seuls les administrateurs peuvent créer, modifier ou supprimer une offre.
+    match /products/{produit} {
+      // Lecture publique : la page catalogue interroge avec le filtre visible == true,
+      // ce qui garantit que seules les offres publiées sont renvoyées.
+      allow get, list: if resource.data.visible == true || estAdmin();
+      allow create, update, delete: if estAdmin()
+        && produit.matches(/^[a-z0-9-]{1,60}$/)
+        && request.resource.data.keys().hasOnly(['id', 'ordre', 'img', 'eur', 'types', 'visible', 'fr', 'ar', 'en'])
+        && request.resource.data.id == produit
+        && request.resource.data.ordre is number
+        && request.resource.data.ordre >= 1
+        && request.resource.data.ordre <= 999
+        && request.resource.data.eur is number
+        && request.resource.data.eur >= 1
+        && request.resource.data.eur <= 1000000
+        && request.resource.data.visible is bool
+        && request.resource.data.types is list
+        && request.resource.data.types.size() >= 1
+        && request.resource.data.types.size() <= 6
+        && request.resource.data.img is string
+        && request.resource.data.img.size() <= 300
+        && request.resource.data.fr is map
+        && request.resource.data.fr.n is string
+        && request.resource.data.fr.n.size() > 0
+        && request.resource.data.fr.n.size() <= 80
+        && request.resource.data.fr.d is string
+        && request.resource.data.fr.d.size() <= 400
+        && request.resource.data.fr.f is list
+        && request.resource.data.fr.f.size() <= 10;
+    }
+
+    // Administration : chaque administrateur peut uniquement consulter son propre statut.
+    // Les administrateurs sont ajoutés depuis la console Firebase (jamais depuis le site).
+    match /admins/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false;
+    }
+  }
+}

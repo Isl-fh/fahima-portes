@@ -71,7 +71,9 @@ if (!configure) {
 
 // ---------- Firebase ----------
 let fb = null;
+let fstore = null; // module Firestore (lien administration)
 let auth = null;
+let db = null;
 let confirmation = null;
 let modeCode = null; // "signup" | "reset"
 let attente = null;  // données d'inscription en attente du code SMS
@@ -101,6 +103,7 @@ function afficherTableau(user) {
   window.__fhUser = user;
   $("vue-auth").hidden = !!user;
   $("vue-dash").hidden = !user;
+  verifierAdmin(user);
   if (!user) return;
   const prenom = (user.displayName || "").split(" ")[0] || "";
   $("dash-titre").textContent = t("acc.welcome", { name: prenom }).trim();
@@ -115,12 +118,16 @@ function afficherTableau(user) {
 async function demarrer() {
   if (!configure) return;
   const v = "10.12.2";
-  const [{ initializeApp }, A] = await Promise.all([
+  const [{ initializeApp }, A, F] = await Promise.all([
     import(`https://www.gstatic.com/firebasejs/${v}/firebase-app.js`),
-    import(`https://www.gstatic.com/firebasejs/${v}/firebase-auth.js`)
+    import(`https://www.gstatic.com/firebasejs/${v}/firebase-auth.js`),
+    import(`https://www.gstatic.com/firebasejs/${v}/firebase-firestore.js`)
   ]);
   fb = A;
-  auth = A.getAuth(initializeApp(firebaseConfig));
+  fstore = F;
+  const application = initializeApp(firebaseConfig);
+  db = F.getFirestore(application);
+  auth = A.getAuth(application);
   auth.languageCode = FH.etat.lang;
   document.addEventListener("fh:change", () => (auth.languageCode = FH.etat.lang));
   A.onAuthStateChanged(auth, (user) => {
@@ -128,6 +135,17 @@ async function demarrer() {
     memoriser(user);
     afficherTableau(user);
   });
+}
+
+// Affiche le lien d'administration si le compte figure dans la collection « admins »
+async function verifierAdmin(user) {
+  var el = $("dash-admin");
+  if (!el) return;
+  if (!user || !db || !fstore || !configure) { el.hidden = true; return; }
+  try {
+    var s = await fstore.getDoc(fstore.doc(db, "admins", user.uid));
+    el.hidden = !s.exists();
+  } catch (e) { el.hidden = true; }
 }
 
 let verificateur = null;

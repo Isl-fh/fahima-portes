@@ -1,40 +1,15 @@
-/* Catalogue FAHIMA PORTES — produits, filtres et demande de devis */
+/* Catalogue FAHIMA PORTES — produits, filtres et demande de devis.
+   Les offres affichées proviennent de Firestore dès que Firebase est configuré
+   (gestion via admin.html) ; sinon la liste ci-dessous sert d'aperçu. */
+import { PRODUITS_INITIAUX } from "./produits-initiaux.js";
+import { firebaseConfig } from "./firebase-config.js";
+
 (function () {
   // Prix de référence en euros (convertis automatiquement en dinars)
-  var PRODUITS = [
-    { id: "geometrique", img: "produit-01.webp", eur: 4599.99, types: ["blindee", "fer-forge", "simple"],
-      fr: { n: "Modèle Géométrique", d: "Un décor géométrique travaillé pour une entrée moderne et sécurisée.", f: ["Serrure multipoints", "Structure renforcée", "Finition noire premium"] },
-      ar: { n: "نموذج هندسي", d: "زخرفة هندسية متقنة لمدخل عصري وآمن.", f: ["قفل متعدد النقاط", "هيكل معزز", "تشطيب أسود فاخر"] },
-      en: { n: "Geometric model", d: "A finely worked geometric pattern for a modern, secure entrance.", f: ["Multi-point lock", "Reinforced structure", "Premium black finish"] } },
-    { id: "horizon", img: "produit-03.webp", eur: 5299.99, types: ["blindee", "simple"],
-      fr: { n: "Modèle Horizon", d: "Un bois clair à fil horizontal souligné d'un encadrement gris anthracite.", f: ["Blindage renforcé", "Poignée barre verticale", "Isolation renforcée"] },
-      ar: { n: "نموذج هورايزن", d: "خشب فاتح بعرق أفقي مع إطار رمادي فحمي.", f: ["تصفيح معزز", "مقبض عمودي", "عزل معزز"] },
-      en: { n: "Horizon model", d: "Light horizontal-grain wood set in an anthracite grey frame.", f: ["Reinforced armour", "Vertical bar handle", "Enhanced insulation"] } },
-    { id: "diagonale", img: "produit-02.webp", eur: 3899.99, types: ["blindee", "simple"],
-      fr: { n: "Modèle Diagonale", d: "Une finition effet bois avec des lignes diagonales.", f: ["Blindage renforcé", "Finition effet bois", "Pose sur devis"] },
-      ar: { n: "نموذج دياغونال", d: "تشطيب بمظهر الخشب مع خطوط مائلة.", f: ["تصفيح معزز", "تشطيب بمظهر الخشب", "التركيب حسب عرض السعر"] },
-      en: { n: "Diagonal model", d: "A wood-effect finish with diagonal lines.", f: ["Reinforced armour", "Wood-effect finish", "Installation on quote"] } },
-    { id: "lumiere", img: "produit-08.webp", eur: 1899.99, types: ["chambre", "simple"],
-      fr: { n: "Modèle Lumière", d: "Une porte claire au jeu de panneaux géométriques.", f: ["Design élégant", "Finition claire", "Pose sur devis"] },
-      ar: { n: "نموذج لوميير", d: "باب فاتح بألواح هندسية متعاكسة.", f: ["تصميم أنيق", "تشطيب فاتح", "التركيب حسب عرض السعر"] },
-      en: { n: "Lumière model", d: "A light door with a geometric panel pattern.", f: ["Elegant design", "Light finish", "Installation on quote"] } },
-    { id: "signature", img: "produit-05.webp", eur: 5799.99, types: ["blindee", "simple"],
-      fr: { n: "Modèle Signature", d: "Un système premium : vantail extérieur blanc ajouré et porte intérieure en noyer.", f: ["Blindage haute résistance", "Double système", "Serrure sécurisée"] },
-      ar: { n: "نموذج سيغناتور", d: "نظام فاخر: مصراع خارجي أبيض مخرّم وباب داخلي من خشب الجوز.", f: ["تصفيح عالي المقاومة", "نظام مزدوج", "قفل آمن"] },
-      en: { n: "Signature model", d: "A premium system: openwork white outer leaf and a walnut inner door.", f: ["High-resistance armour", "Dual system", "Secure lock"] } },
-    { id: "double", img: "produit-04.webp", eur: 8799.99, types: ["blindee", "double", "fer-forge"],
-      fr: { n: "Modèle Double", d: "Une grande porte à double vantail pour les entrées prestigieuses.", f: ["Double vantail", "Poignées ergonomiques", "Structure renforcée"] },
-      ar: { n: "النموذج المزدوج", d: "باب كبير بمصراعين للمداخل الفخمة.", f: ["مصراعان", "مقابض مريحة", "هيكل معزز"] },
-      en: { n: "Double model", d: "A large double-leaf door for prestigious entrances.", f: ["Double leaf", "Ergonomic handles", "Reinforced structure"] } },
-    { id: "contraste", img: "produit-09.webp", eur: 6499.99, types: ["blindee", "simple", "fer-forge"],
-      fr: { n: "Modèle Contraste", d: "Une porte d'entrée au relief hexagonal noir sur panneau clair.", f: ["Relief hexagonal 3D", "Serrure sécurisée", "Finitions modernes"] },
-      ar: { n: "نموذج كونتراست", d: "باب مدخل بنقوش سداسية سوداء بارزة على خلفية فاتحة.", f: ["نقوش سداسية ثلاثية الأبعاد", "قفل آمن", "تشطيبات عصرية"] },
-      en: { n: "Contrast model", d: "An entrance door with a black hexagonal relief on a light panel.", f: ["3D hexagonal relief", "Secure lock", "Modern finishes"] } },
-    { id: "prestige", img: "produit-07.webp", eur: 7299.99, types: ["double", "salon"],
-      fr: { n: "Modèle Prestige", d: "Une porte double de salon en bois avec des vitrages décoratifs.", f: ["Double vantail", "Vitrages décoratifs", "Finition bois premium"] },
-      ar: { n: "نموذج بريستيج", d: "باب مزدوج للصالون من الخشب مع زجاج زخرفي.", f: ["مصراعان", "زجاج زخرفي", "تشطيب خشبي فاخر"] },
-      en: { n: "Prestige model", d: "A double living-room door in wood with decorative glazing.", f: ["Double leaf", "Decorative glazing", "Premium wood finish"] } }
-  ];
+  var PRODUITS = PRODUITS_INITIAUX.map(function (p, i) {
+    return Object.assign({ ordre: i + 1, visible: true }, p);
+  });
+
 
   var grille = document.getElementById("catalogue");
   var aucun = document.getElementById("aucun-resultat");
@@ -178,6 +153,29 @@
       FH.t("form.wa.msg") + " :\n" + d.get("message");
     window.open("https://wa.me/33784885023?text=" + encodeURIComponent(msg), "_blank", "noopener");
   });
+
+  // Catalogue géré : Firestore devient la source des offres quand Firebase est configuré.
+  // Tant que la base est vide (import non fait), la liste d'aperçu reste affichée.
+  if (firebaseConfig.apiKey && firebaseConfig.apiKey !== "A_REMPLIR") {
+    var v = "10.12.2";
+    Promise.all([
+      import("https://www.gstatic.com/firebasejs/" + v + "/firebase-app.js"),
+      import("https://www.gstatic.com/firebasejs/" + v + "/firebase-firestore.js")
+    ]).then(async function (mods) {
+      var app = mods[0].initializeApp(firebaseConfig);
+      var F = mods[1];
+      var bdd = F.getFirestore(app);
+      var snap = await F.getDocs(F.query(F.collection(bdd, "products"), F.where("visible", "==", true), F.orderBy("ordre")));
+      if (snap.empty) {
+        console.warn("Catalogue Firestore vide : liste d'aperçu affichée. Importez le catalogue depuis la page d'administration (admin.html).");
+        return;
+      }
+      PRODUITS = snap.docs.map(function (d) { return Object.assign({ id: d.id }, d.data()); });
+      rendre();
+    }).catch(function (e) {
+      console.warn("Catalogue géré indisponible, liste d'aperçu affichée.", e);
+    });
+  }
 
   rendre();
 })();

@@ -1,0 +1,73 @@
+/* Administration FAHIMA PORTES — gestion du catalogue */
+.admin-espace {
+  flex: 1;
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 50px 5% 80px;
+}
+.carte-admin {
+  padding: 34px;
+  border: 1px solid rgba(201,162,77,.45);
+  background: linear-gradient(180deg, #151515, #0e0e0e);
+  box-shadow: 0 20px 50px rgba(0,0,0,.4);
+}
+.carte-admin.large { max-width: none; }
+.carte-admin h1 { margin-bottom: 18px; color: var(--or-clair); font-family: Georgia, serif; font-size: clamp(26px, 3vw, 34px); font-weight: normal; }
+.admin-tete { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+.admin-tete h1 { margin-bottom: 0; }
+.admin-session { display: flex; align-items: center; gap: 12px; color: var(--gris); font-size: 13px; }
+.admin-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 22px; }
+
+/* Champs */
+.admin-espace .champ label, .admin-espace legend { display: block; margin-bottom: 6px; color: var(--or-clair); font-size: 12px; font-weight: bold; }
+.admin-espace input, .admin-espace select, .admin-espace textarea {
+  width: 100%; padding: 10px 12px; border: 1px solid #5d5444; border-radius: 3px;
+  color: #f4efe4; background: #0a0a0a; font: inherit; font-size: 14px;
+}
+.admin-espace input:focus, .admin-espace textarea:focus { outline: none; border-color: var(--or-clair); box-shadow: 0 0 0 3px rgba(242,213,138,.18); }
+.admin-espace textarea { resize: vertical; }
+.grille-champs { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 18px 0; }
+.grille-champs .complet { grid-column: 1 / -1; }
+.types-case { border: 1px solid rgba(201,162,77,.35); padding: 12px; }
+.cases { display: flex; flex-wrap: wrap; gap: 8px 18px; }
+.formulaire-produit h2 { color: var(--or-clair); font-family: Georgia, serif; font-weight: normal; font-size: 22px; }
+.formulaire-produit { border-top: 1px solid rgba(201,162,77,.3); padding-top: 8px; }
+
+/* Boutons (repris de compte.css) */
+.admin-espace .principal, .admin-espace .secondaire {
+  display: inline-block; padding: 12px 20px; border: 0; border-radius: 2px;
+  cursor: pointer; font: inherit; font-weight: bold; font-size: 14px; text-align: center; text-decoration: none;
+  transition: transform .2s, opacity .2s;
+}
+.admin-espace .principal { color: var(--noir); background: linear-gradient(135deg, var(--or-clair), var(--or)); }
+.admin-espace .secondaire { color: var(--or-clair); background: transparent; border: 1px solid var(--or); }
+.admin-espace .principal:hover, .admin-espace .secondaire:hover { transform: translateY(-2px); }
+.admin-espace button:disabled { opacity: .5; cursor: not-allowed; transform: none !important; }
+
+/* Alertes */
+.admin-espace .alerte { margin-bottom: 18px; padding: 12px 14px; border-inline-start: 3px solid var(--rouge); background: rgba(227,38,45,.12); font-size: 14px; line-height: 1.6; }
+.admin-espace .alerte.ok { border-color: #3fa66b; background: rgba(63,166,107,.12); }
+.admin-espace .alerte.info { border-color: var(--or); background: rgba(201,162,77,.12); }
+
+/* Tableau des produits */
+.admin-tableau { display: grid; gap: 10px; }
+.ligne-produit {
+  display: grid; grid-template-columns: 64px 1fr auto; gap: 14px; align-items: center;
+  padding: 10px 12px; border: 1px solid rgba(201,162,77,.25); background: rgba(255,255,255,.02);
+}
+.ligne-produit img { width: 64px; height: 64px; object-fit: cover; border-radius: 4px; background: #000; }
+.ligne-produit .infos-ligne { min-width: 0; }
+.ligne-produit .nom-ligne { color: #fff; font-weight: bold; font-size: 15px; }
+.ligne-produit .details-ligne { color: var(--gris); font-size: 13px; margin-top: 3px; }
+.ligne-produit .details-ligne .cache { color: #e38a8d; }
+.ligne-produit .actions-ligne { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+.btn-mini { padding: 8px 12px; font-size: 13px; }
+.btn-mini.danger { border-color: #a33; color: #e8a5a8; }
+
+@media (max-width: 720px) {
+  .grille-champs { grid-template-columns: 1fr; }
+  .ligne-produit { grid-template-columns: 56px 1fr; }
+  .ligne-produit .actions-ligne { grid-column: 1 / -1; justify-content: flex-start; }
+  .carte-admin { padding: 22px 16px; }
+}
