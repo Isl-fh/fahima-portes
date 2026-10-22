@@ -1,0 +1,319 @@
+
+        .ancien-root {
+            --noir: #080808;
+            --noir-clair: #151515;
+            --or: #c9a24d;
+            --or-clair: #f2d58a;
+            --fond: #f5f0e7;
+            --blanc: #ffffff;
+            --texte: #3d3a34;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            color: var(--texte);
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background: var(--fond);
+        }
+
+        .intro {
+            padding: 65px 20px 75px;
+            color: white;
+            background: var(--noir);
+            text-align: center;
+        }
+
+        .intro small {
+            color: var(--or-clair);
+            font-size: 12px;
+            font-weight: bold;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+        }
+
+        .intro h1 {
+            margin: 15px 0;
+            font-family: Georgia, serif;
+            font-size: clamp(40px, 6vw, 70px);
+            font-weight: normal;
+        }
+
+        .intro h1 span {
+            color: var(--or-clair);
+            font-style: italic;
+        }
+
+        .intro p {
+            max-width: 680px;
+            margin: auto;
+            color: #d6d1c7;
+        }
+
+        .filtres {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 15px;
+            position: relative;
+            width: 86%;
+            max-width: 1150px;
+            margin: -30px auto 0;
+            padding: 25px;
+            background: var(--noir-clair);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, .2);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            color: var(--or-clair);
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d7c8a4;
+            border-radius: 3px;
+            color: var(--texte);
+            background: white;
+        }
+
+        .catalogue {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            max-width: 1250px;
+            margin: auto;
+            padding: 50px 25px 75px;
+        }
+
+        .porte {
+            overflow: hidden;
+            background: var(--blanc);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, .13);
+        }
+
+        .porte img {
+            display: block;
+            width: 100%;
+            height: 340px;
+            object-fit: cover;
+        }
+
+        .informations {
+            padding: 22px;
+        }
+
+        .informations h2 {
+            color: var(--noir);
+            font-family: Georgia, serif;
+            font-size: 23px;
+            font-weight: normal;
+        }
+
+        .type {
+            margin: 5px 0 10px;
+            color: #80632b;
+            font-size: 12px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .description {
+            min-height: 75px;
+        }
+
+        .prix {
+            margin: 14px 0;
+            color: #9b7222;
+            font-family: Georgia, serif;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .details {
+            min-height: 100px;
+            margin-bottom: 18px;
+            list-style: none;
+        }
+
+        .details li::before {
+            content: "✦ ";
+            color: var(--or);
+        }
+
+        .devis,
+        .envoyer {
+            padding: 12px 18px;
+            border: 0;
+            color: var(--or-clair);
+            background: var(--noir);
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .devis:hover,
+        .envoyer:hover {
+            color: var(--noir);
+            background: var(--or);
+        }
+
+        .aucun-resultat {
+            display: none;
+            grid-column: 1 / -1;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .contact {
+            padding: 50px 20px;
+            color: white;
+            background: var(--noir);
+            text-align: center;
+        }
+
+        .contact h2 {
+            margin-bottom: 10px;
+            color: var(--or-clair);
+            font-family: Georgia, serif;
+            font-weight: normal;
+        }
+
+        .contact a {
+            color: var(--or-clair);
+        }
+
+        .fenetre {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            position: fixed;
+            inset: 0;
+            z-index: 20;
+            padding: 20px;
+            background: rgba(0, 0, 0, .8);
+        }
+
+        .fenetre.active {
+            display: flex;
+        }
+
+        .formulaire {
+            position: relative;
+            width: 100%;
+            max-width: 580px;
+            max-height: 92vh;
+            overflow-y: auto;
+            padding: 30px;
+            background: var(--fond);
+        }
+
+        .formulaire h2 {
+            color: var(--noir);
+            font-family: Georgia, serif;
+            font-weight: normal;
+        }
+
+        .formulaire p {
+            margin-bottom: 18px;
+            font-size: 14px;
+        }
+
+        .fermer {
+            position: absolute;
+            top: 8px;
+            right: 15px;
+            border: 0;
+            color: var(--noir);
+            background: transparent;
+            cursor: pointer;
+            font-size: 28px;
+        }
+
+        .champ {
+            margin-bottom: 13px;
+        }
+
+        .deux-champs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .envoyer {
+            width: 100%;
+            margin-top: 8px;
+        }
+
+        .note {
+            margin-top: 10px;
+            color: #665d4c;
+            font-size: 12px;
+        }
+
+        @media (max-width: 950px) {
+            .filtres {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .catalogue {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 650px) {
+
+            .filtres,
+            .deux-champs {
+                grid-template-columns: 1fr;
+            }
+
+            .catalogue {
+                grid-template-columns: 1fr;
+                padding-right: 7%;
+                padding-left: 7%;
+            }
+        }
+    
+/* Ajouts refonte */
+:root { --fond: #f5f0e7; --texte: #3d3a34; }
+body { color: var(--texte); font-family: Arial, sans-serif; line-height: 1.6; background: var(--fond); margin: 0; }
+html[lang="ar"] body { line-height: 1.9; }
+.porte { display: flex; flex-direction: column; transition: transform .3s, box-shadow .3s; }
+.porte:hover { transform: translateY(-4px); box-shadow: 0 14px 30px rgba(0,0,0,.18); }
+.informations { display: flex; flex: 1; flex-direction: column; }
+.devis { margin-top: auto; }
+.prix small { display: block; color: #8b8170; font-family: Arial, sans-serif; font-size: 11px; font-weight: normal; letter-spacing: .5px; text-transform: uppercase; }
+html[lang="ar"] .prix small { font-family: inherit; letter-spacing: 0; }
+.prix { font-variant-numeric: tabular-nums; }
+html[lang="ar"] .intro h1, html[lang="ar"] .informations h2, html[lang="ar"] .prix { font-family: "Noto Kufi Arabic", Tahoma, sans-serif; }
+html[dir="rtl"] .fermer { right: auto; left: 15px; }
+html[dir="rtl"] .details li::before { content: "✦ "; }
+.prefill { display: none; margin: -6px 0 14px; padding: 8px 12px; border-inline-start: 3px solid var(--or); background: #ece3d1; font-size: 13px; }
+.prefill.visible { display: block; }
+.contact a[dir="ltr"] { unicode-bidi: isolate; }
+@media (max-width: 650px) { .porte img { height: 300px; } }
+
+/* Bouton WhatsApp dans la modale de devis */
+.envoyer.wa {
+  margin-top: 10px;
+  color: #5fd468; background: rgba(63,174,74,.08);
+  border: 1px solid #3fae4a;
+}
+.envoyer.wa:hover { color: var(--noir); background: #5fd468; box-shadow: none; }
+.contact-whatsapp { margin-top: 14px; }
