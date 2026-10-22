@@ -217,14 +217,25 @@ $("form-produit").addEventListener("submit", async (e) => {
   const ar = blocLangue("p-nom-ar", "p-desc-ar", "p-caract-ar", fr);
   const en = blocLangue("p-nom-en", "p-desc-en", "p-caract-en", fr);
   const id = editionId || slug(nomFr);
-  if (!editionId && produits.some((p) => p.id === id)) return message("Une offre porte déjà ce nom : choisissez un autre nom.");
-
   const donnees = { id, ordre, img, eur, types, visible: $("p-visible").checked, fr, ar, en };
   try {
-    await fstore.setDoc(fstore.doc(db, "products", id), donnees);
+    if (editionId) {
+      // Modification : remplacement complet autorisé
+      await fstore.setDoc(fstore.doc(db, "products", editionId), donnees);
+    } else {
+      // Création : transaction — n'écrase jamais une offre créée simultanément
+      await fstore.runTransaction(db, (tx) =>
+        tx.get(fstore.doc(db, "products", id)).then((snap) => {
+          if (snap.exists()) throw new Error("offre-existe");
+          tx.set(fstore.doc(db, "products", id), donnees);
+        })
+      );
+    }
     message('Offre "' + nomFr + '" enregistrée.', "ok");
     fermerFormulaire();
   } catch (err) {
+    if (err && err.message === "offre-existe")
+      return message("Une offre porte déjà ce nom : choisissez un autre nom.");
     message("Enregistrement impossible : " + err.message);
   }
 });
@@ -238,11 +249,17 @@ $("btn-importer").addEventListener("click", async () => {
     for (let i = 0; i < PRODUITS_INITIAUX.length; i++) {
       const p = PRODUITS_INITIAUX[i];
       const ref = fstore.doc(db, "products", p.id);
-      const existant = await fstore.getDoc(ref);
-      if (existant.exists()) continue; // n'écrase jamais une offre déjà enregistrée
       const donnees = Object.assign({ ordre: i + 1, visible: true }, p);
-      await fstore.setDoc(ref, donnees);
-      ajoutes++;
+      // Transaction : ne crée que si l'offre est toujours absente,
+      // même si un autre administrateur agit au même moment.
+      const cree = await fstore.runTransaction(db, (tx) =>
+        tx.get(ref).then((snap) => {
+          if (snap.exists()) return false;
+          tx.set(ref, donnees);
+          return true;
+        })
+      );
+      if (cree) ajoutes++;
     }
     message("Import terminé : " + ajoutes + " offre(s) ajoutée(s), les offres existantes ont été conservées.", "ok");
   } catch (err) {

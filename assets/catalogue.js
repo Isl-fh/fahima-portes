@@ -79,11 +79,33 @@ import { firebaseConfig } from "./firebase-config.js";
       carte.style.display = ok ? "" : "none";
       if (ok) visibles++;
     });
-    aucun.style.display = visibles ? "none" : "block";
+    // Si le catalogue géré est vide, seul le message d'état dédié s'affiche.
+    aucun.style.display = (visibles || !PRODUITS.length) ? "none" : "block";
   }
 
   [recherche, prixMin, prixMax].forEach(function (el) { el.addEventListener("input", filtrer); });
   categorie.addEventListener("change", filtrer);
+
+  // États du catalogue géré : message dédié (chargement / vide / erreur),
+  // dans la langue active — jamais écrasé par les traductions.
+  var etatCatalogue = "pret"; // "chargement" | "pret" | "erreur"
+  var infoCatalogue = document.getElementById("catalogue-info");
+  var MESSAGES = {
+    chargement: { fr: "Chargement du catalogue…", ar: "جاري تحميل الكتالوج…", en: "Loading the catalogue…" },
+    erreur: { fr: "Le catalogue est momentanément indisponible. Merci de réessayer dans un instant.", ar: "الكتالوج غير متاح مؤقتًا. يرجى المحاولة بعد قليل.", en: "The catalogue is temporarily unavailable. Please try again shortly." },
+    vide: { fr: "Aucune offre disponible pour le moment.", ar: "لا توجد عروض متاحة حاليًا.", en: "No offers available at the moment." }
+  };
+  function majInfoCatalogue() {
+    if (!infoCatalogue) return;
+    var L = MESSAGES.chargement[FH.etat.lang] ? FH.etat.lang : "fr";
+    var txt = "";
+    if (etatCatalogue === "chargement") txt = MESSAGES.chargement[L];
+    else if (etatCatalogue === "erreur") txt = MESSAGES.erreur[L];
+    else if (!PRODUITS.length) txt = MESSAGES.vide[L];
+    infoCatalogue.textContent = txt;
+    // la classe .aucun-resultat vaut display:none : affichage via style inline
+    infoCatalogue.style.display = txt ? "block" : "none";
+  }
 
   // Changement de devise : convertit les valeurs saisies dans les filtres
   var deviseAvant = FH.etat.cur;
@@ -97,6 +119,7 @@ import { firebaseConfig } from "./firebase-config.js";
       deviseAvant = e.detail.cur;
     }
     rendre();
+    majInfoCatalogue();
   });
 
   // Fenêtre de devis
@@ -168,13 +191,10 @@ import { firebaseConfig } from "./firebase-config.js";
   //   Base vide = catalogue vide ; erreur = message d'indisponibilité visible.
   if (firebaseConfig.apiKey && firebaseConfig.apiKey !== "A_REMPLIR") {
     var v = "10.12.2";
-    var info = function (txt) {
-      aucun.textContent = txt;
-      aucun.style.display = txt ? "block" : "none";
-    };
+    etatCatalogue = "chargement";
     PRODUITS = [];
     rendre();
-    info("Chargement du catalogue…");
+    majInfoCatalogue();
     Promise.all([
       import("https://www.gstatic.com/firebasejs/" + v + "/firebase-app.js"),
       import("https://www.gstatic.com/firebasejs/" + v + "/firebase-firestore.js")
@@ -184,13 +204,16 @@ import { firebaseConfig } from "./firebase-config.js";
       var bdd = F.getFirestore(app);
       var snap = await F.getDocs(F.query(F.collection(bdd, "products"), F.where("visible", "==", true), F.orderBy("ordre")));
       PRODUITS = snap.docs.map(function (d) { return Object.assign({ id: d.id }, d.data()); });
+      etatCatalogue = "pret";
       rendre();
+      majInfoCatalogue();
       if (!PRODUITS.length) console.warn("Catalogue Firestore vide : aucune offre visible. Ajoutez des offres depuis l'administration (admin.html).");
     }).catch(function (e) {
       console.warn("Catalogue géré indisponible.", e);
+      etatCatalogue = "erreur";
       PRODUITS = [];
       rendre();
-      info("Le catalogue est momentanément indisponible. Merci de réessayer dans un instant.");
+      majInfoCatalogue();
     });
   } else {
     rendre();
