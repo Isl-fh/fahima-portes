@@ -423,6 +423,16 @@ import { session } from "./session.js?v=20261024";
         var snap = await F.getDocs(F.query(F.collection(session.db, "products"), F.where("visible", "==", true)));
         PRODUITS = snap.docs.map(function (d) { return Object.assign({ id: d.id }, d.data()); })
           .sort(function (a, b) { return (a.ordre || 999) - (b.ordre || 999); });
+        /* APERÇU — renommages appliqués côté navigateur en attendant la mise à jour
+           des documents Firestore (products/double, products/signature, products/prestige).
+           À SUPPRIMER une fois ces documents mis à jour dans Firebase (après publication
+           des règles de sécurité). Les données réelles ne sont pas modifiées ici. */
+        var RENOMMAGES_APERCU = { double: true, signature: true, prestige: true };
+        PRODUITS.forEach(function (p) {
+          if (RENOMMAGES_APERCU[p.id]) {
+            PRODUITS_INITIAUX.forEach(function (s) { if (s.id === p.id) Object.assign(p, s); });
+          }
+        });
         etatCatalogue = "pret";
         rendre();
         majInfoCatalogue();
