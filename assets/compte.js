@@ -159,6 +159,9 @@ async function envoyerSms(e164, mode) {
 }
 
 async function persistance() {
+  /* Stockage indisponible (cadre restreint, navigation privée) :
+     la persistance en mémoire est déjà définie par session.js. */
+  if (session.stockageLocal === false) return;
   await fb.setPersistence(auth, $("remember").checked ? fb.browserLocalPersistence : fb.browserSessionPersistence);
 }
 

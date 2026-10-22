@@ -99,7 +99,6 @@ $("form-admin-login").addEventListener("submit", async (e) => {
   if (!email || !pw) return;
   infoConnexion("Connexion en cours…", false);
   try {
-    try { await fb.setPersistence(auth, fb.browserLocalPersistence); } catch (e) { console.warn("Persistance indisponible", e); }
     await fb.signInWithEmailAndPassword(auth, email, pw);
     $("admin-pw").value = "";
   } catch (err) {

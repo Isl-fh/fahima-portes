@@ -16,16 +16,19 @@ export const session = {
 
 /* stockage peut être indisponible (cadre restreint, navigation privée) :
    on bascule alors sur un stockage en mémoire sans faire planter la page. */
+let stockageLocal = false;
 const stockage = (() => {
   try {
     const t = window.localStorage;
     t.setItem("__fh_test", "1");
     t.removeItem("__fh_test");
+    stockageLocal = true;
     return t;
   } catch {
     return { getItem: () => null, setItem: () => {}, removeItem: () => {} };
   }
 })();
+session.stockageLocal = stockageLocal;
 
 const configure = firebaseConfig.apiKey && firebaseConfig.apiKey !== "A_REMPLIR";
 const quand = demarrer();
@@ -78,6 +81,12 @@ async function demarrer() {
   session.fb = A;
   session.fstore = F;
   session.auth = A.getAuth(app);
+  /* Persistance : locale si le stockage du navigateur est disponible,
+     sinon en mémoire (cadre restreint, navigation privée) — sinon la
+     connexion elle-même échoue avec une SecurityError. */
+  try {
+    await A.setPersistence(session.auth, stockageLocal ? A.browserLocalPersistence : A.browserInMemoryPersistence);
+  } catch (e) { console.warn("Persistance Firebase indisponible", e); }
   session.db = F.getFirestore(app);
   if (window.FH) session.auth.languageCode = FH.etat.lang;
   document.addEventListener("fh:change", function () {
