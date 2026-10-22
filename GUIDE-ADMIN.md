@@ -67,8 +67,9 @@ uniquement après ces tests.
 
 ## Étape 7 — Créer votre compte administrateur
 
-1. Sur le site en ligne, ouvrez la page **Mon compte** et créez votre compte
-   avec votre e-mail personnel.
+1. Ouvrez la page **Mon compte** — sur l'aperçu du site tant que la nouvelle
+   version n'est pas publiée, ou sur le site en ligne après publication — et
+   créez votre compte avec votre e-mail personnel.
 2. Dans la console Firebase : **Authentication > Utilisateurs**, et copiez
    l'**UID** de votre compte (colonne « UID utilisateur »).
 3. Dans **Firestore Database**, cliquez **« Démarrer une collection »** :
@@ -80,8 +81,10 @@ uniquement après ces tests.
 
 ## Étape 8 — Importer le catalogue et gérer les offres
 
-1. Connectez-vous sur `www.fh-portes.com/admin.html` (ou via le bouton
-   **Administration** dans votre espace client).
+1. Connectez-vous sur la page d'administration (`admin.html` — via le bouton
+   **Administration** dans votre espace client). Tant que la nouvelle version
+   n'est pas publiée, faites-le sur l'aperçu ; l'adresse
+   `www.fh-portes.com/admin.html` fonctionnera après publication.
 2. Cliquez sur **« Importer le catalogue actuel »** : les 8 modèles entrent
    dans la base. Ce bouton disparaît ensuite.
 3. Vous pouvez maintenant **ajouter des offres**, **changer les prix**,
