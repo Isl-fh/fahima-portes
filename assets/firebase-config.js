@@ -1,12 +1,14 @@
 // Configuration Firebase de FAHIMA PORTES.
-// Remplacez les valeurs ci-dessous par celles de votre projet Firebase
-// (Console Firebase > Paramètres du projet > Vos applications > Configuration du SDK).
-// Tant que "apiKey" vaut "A_REMPLIR", l'espace client affiche « en cours d'activation ».
+// Valeurs fournies par la console Firebase (Paramètres du projet > Vos applications).
+// Ce bloc est public par conception : il est inclus dans le code du site.
 export const firebaseConfig = {
-  apiKey: "A_REMPLIR",
-  authDomain: "A_REMPLIR.firebaseapp.com",
-  projectId: "A_REMPLIR",
-  appId: "A_REMPLIR"
+  apiKey: "AIzaSyAFoNLiAZsoQgP8COziLTlwj2cEOIbilcU",
+  authDomain: "fahima-portes-1e1cc.firebaseapp.com",
+  projectId: "fahima-portes-1e1cc",
+  storageBucket: "fahima-portes-1e1cc.firebasestorage.app",
+  messagingSenderId: "699697892998",
+  appId: "1:699697892998:web:e95c1ea20f49778e5dcb07",
+  measurementId: "G-QGFSY475NJ"
 };
 
 // Domaine technique utilisé pour associer un mot de passe aux comptes créés par téléphone.
