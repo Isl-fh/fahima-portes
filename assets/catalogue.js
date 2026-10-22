@@ -30,7 +30,7 @@ import { firebaseConfig } from "./firebase-config.js";
       a.className = "porte";
       a.dataset.id = p.id;
       a.innerHTML =
-        '<img src="' + p.img + '" alt="' + esc(x.n) + '" width="1024" height="1024" loading="lazy">' +
+        '<img alt="" width="1024" height="1024" loading="lazy">' +
         '<div class="informations">' +
         "<h2>" + esc(x.n) + "</h2>" +
         '<p class="type">' + esc(types) + "</p>" +
@@ -39,14 +39,22 @@ import { firebaseConfig } from "./firebase-config.js";
         '<ul class="details">' + x.f.map(function (f) { return "<li>" + esc(f) + "</li>"; }).join("") + "</ul>" +
         '<button class="devis" type="button">' + esc(FH.t("cat.quote")) + "</button>" +
         "</div>";
+      var image = a.querySelector("img");
+      image.src = p.img; // affectation directe : jamais insérée dans du HTML
+      image.alt = x.n;
       a.querySelector(".devis").addEventListener("click", function () { ouvrir(p); });
       grille.insertBefore(a, aucun);
     });
     document.querySelectorAll(".sym").forEach(function (s) { s.textContent = FH.symbole(); });
-    var lo = Math.min.apply(null, PRODUITS.map(function (p) { return p.eur; }));
-    var hi = Math.max.apply(null, PRODUITS.map(function (p) { return p.eur; }));
-    prixMin.placeholder = FH.nombre(FH.convertir(lo));
-    prixMax.placeholder = FH.nombre(FH.convertir(hi));
+    if (PRODUITS.length) {
+      var lo = Math.min.apply(null, PRODUITS.map(function (p) { return p.eur; }));
+      var hi = Math.max.apply(null, PRODUITS.map(function (p) { return p.eur; }));
+      prixMin.placeholder = FH.nombre(FH.convertir(lo));
+      prixMax.placeholder = FH.nombre(FH.convertir(hi));
+    } else {
+      prixMin.placeholder = "";
+      prixMax.placeholder = "";
+    }
     prixMin.step = prixMax.step = FH.etat.cur === "EUR" ? "1" : "1000";
     filtrer();
   }
@@ -154,10 +162,19 @@ import { firebaseConfig } from "./firebase-config.js";
     window.open("https://wa.me/33784885023?text=" + encodeURIComponent(msg), "_blank", "noopener");
   });
 
-  // Catalogue géré : Firestore devient la source des offres quand Firebase est configuré.
-  // Tant que la base est vide (import non fait), la liste d'aperçu reste affichée.
+  // Source des offres :
+  // - Firebase non configuré : liste d'aperçu statique (aucun admin actif).
+  // - Firebase configuré : les offres viennent uniquement de Firestore.
+  //   Base vide = catalogue vide ; erreur = message d'indisponibilité visible.
   if (firebaseConfig.apiKey && firebaseConfig.apiKey !== "A_REMPLIR") {
     var v = "10.12.2";
+    var info = function (txt) {
+      aucun.textContent = txt;
+      aucun.style.display = txt ? "block" : "none";
+    };
+    PRODUITS = [];
+    rendre();
+    info("Chargement du catalogue…");
     Promise.all([
       import("https://www.gstatic.com/firebasejs/" + v + "/firebase-app.js"),
       import("https://www.gstatic.com/firebasejs/" + v + "/firebase-firestore.js")
@@ -166,16 +183,16 @@ import { firebaseConfig } from "./firebase-config.js";
       var F = mods[1];
       var bdd = F.getFirestore(app);
       var snap = await F.getDocs(F.query(F.collection(bdd, "products"), F.where("visible", "==", true), F.orderBy("ordre")));
-      if (snap.empty) {
-        console.warn("Catalogue Firestore vide : liste d'aperçu affichée. Importez le catalogue depuis la page d'administration (admin.html).");
-        return;
-      }
       PRODUITS = snap.docs.map(function (d) { return Object.assign({ id: d.id }, d.data()); });
       rendre();
+      if (!PRODUITS.length) console.warn("Catalogue Firestore vide : aucune offre visible. Ajoutez des offres depuis l'administration (admin.html).");
     }).catch(function (e) {
-      console.warn("Catalogue géré indisponible, liste d'aperçu affichée.", e);
+      console.warn("Catalogue géré indisponible.", e);
+      PRODUITS = [];
+      rendre();
+      info("Le catalogue est momentanément indisponible. Merci de réessayer dans un instant.");
     });
+  } else {
+    rendre();
   }
-
-  rendre();
 })();

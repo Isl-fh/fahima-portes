@@ -10,13 +10,12 @@ service cloud.firestore {
 
     // Catalogue : offres du site.
     // - Lecture publique limitée aux offres visibles (la page catalogue interroge avec visible == true).
-    // - Seuls les administrateurs peuvent créer, modifier ou supprimer une offre.
+    // - Création et modification réservées aux administrateurs, avec contrôles complets.
+    // - Suppression réservée aux administrateurs (aucune donnée future à valider).
     match /products/{produit} {
-      // Lecture publique : la page catalogue interroge avec le filtre visible == true,
-      // ce qui garantit que seules les offres publiées sont renvoyées.
       allow get, list: if resource.data.visible == true || estAdmin();
-      allow create, update, delete: if estAdmin()
-        && produit.matches(/^[a-z0-9-]{1,60}$/)
+      allow create, update: if estAdmin()
+        && produit.matches('^[a-z0-9-]{1,60}$')
         && request.resource.data.keys().hasOnly(['id', 'ordre', 'img', 'eur', 'types', 'visible', 'fr', 'ar', 'en'])
         && request.resource.data.id == produit
         && request.resource.data.ordre is number
@@ -29,16 +28,35 @@ service cloud.firestore {
         && request.resource.data.types is list
         && request.resource.data.types.size() >= 1
         && request.resource.data.types.size() <= 6
+        && request.resource.data.types.hasOnly(['blindee', 'fer-forge', 'simple', 'double', 'chambre', 'salon'])
         && request.resource.data.img is string
         && request.resource.data.img.size() <= 300
         && request.resource.data.fr is map
+        && request.resource.data.fr.keys().hasOnly(['n', 'd', 'f'])
         && request.resource.data.fr.n is string
         && request.resource.data.fr.n.size() > 0
         && request.resource.data.fr.n.size() <= 80
         && request.resource.data.fr.d is string
         && request.resource.data.fr.d.size() <= 400
         && request.resource.data.fr.f is list
-        && request.resource.data.fr.f.size() <= 10;
+        && request.resource.data.fr.f.size() <= 10
+        && request.resource.data.ar is map
+        && request.resource.data.ar.keys().hasOnly(['n', 'd', 'f'])
+        && request.resource.data.ar.n is string
+        && request.resource.data.ar.n.size() <= 80
+        && request.resource.data.ar.d is string
+        && request.resource.data.ar.d.size() <= 400
+        && request.resource.data.ar.f is list
+        && request.resource.data.ar.f.size() <= 10
+        && request.resource.data.en is map
+        && request.resource.data.en.keys().hasOnly(['n', 'd', 'f'])
+        && request.resource.data.en.n is string
+        && request.resource.data.en.n.size() <= 80
+        && request.resource.data.en.d is string
+        && request.resource.data.en.d.size() <= 400
+        && request.resource.data.en.f is list
+        && request.resource.data.en.f.size() <= 10;
+      allow delete: if estAdmin();
     }
 
     // Administration : chaque administrateur peut uniquement consulter son propre statut.

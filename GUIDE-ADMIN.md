@@ -2,7 +2,9 @@
 
 Ce guide explique comment activer la création de comptes clients et la gestion
 du catalogue (ajouter des offres, changer les prix et les descriptions) pour le
-site FAHIMA PORTES. Tout est gratuit avec le plan Firebase « Spark ».
+site FAHIMA PORTES. Le plan Firebase « Spark » couvre le besoin actuel
+(e-mail/mot de passe et Firestore) ; l'inscription par SMS, elle, demande un
+plan payant et reste désactivée dans cette version.
 
 ## Ce qui a été construit
 
@@ -14,10 +16,12 @@ site FAHIMA PORTES. Tout est gratuit avec le plan Firebase « Spark ».
   - masquer ou afficher une offre ;
   - supprimer une offre ;
   - importer en un clic les 8 modèles actuels comme point de départ.
-- **Catalogue public** (`catalogue.html`) : affiche automatiquement les offres
-  enregistrées dans la base (les plus récentes), dans les 3 langues.
+- **Catalogue public** (`catalogue.html`) : affiche les offres enregistrées dans
+  la base, dans les 3 langues. La page lit la base à chaque chargement : un
+  visiteur voit vos modifications en actualisant la page (pas d'écoute en temps
+  réel).
 
-## Étape 1 — Créer le projet Firebase (5 minutes, gratuit)
+## Étape 1 — Créer le projet Firebase
 
 1. Allez sur [console.firebase.google.com](https://console.firebase.google.com)
    et connectez-vous avec un compte Google.
@@ -86,7 +90,12 @@ valeurs copiées à l'étape 2, puis mettez le site à jour (fusion de la branch
 - Pour la photo d'une nouvelle offre : indiquez le nom d'une image du site
   (ex. `produit-10.webp`, à envoyer au préalable dans le dépôt GitHub) ou une
   adresse `https://...` complète.
-- Les modifications apparaissent immédiatement sur le catalogue du site.
+- Les modifications apparaissent sur le catalogue lors du chargement de la
+  page (le visiteur doit actualiser sa page).
 - L'inscription par SMS (téléphone) nécessite un plan payant Firebase et la
-  saisie d'une carte bancaire : elle reste désactivée tant que vous ne l'avez
-  pas configurée.
+  saisie d'une carte bancaire : elle est désactivée dans cette version et ne
+  doit être activée qu'après tests complets (envoi de code, connexion,
+  récupération).
+- Les règles de sécurité du fichier `firestore.rules` doivent être publiées
+  dans la console Firebase (étape 4) : leur simple présence dans le dépôt ne
+  protège rien tant qu'elles n'y sont pas collées et publiées.

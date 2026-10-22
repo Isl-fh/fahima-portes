@@ -11,3 +11,8 @@ export const firebaseConfig = {
 
 // Domaine technique utilisé pour associer un mot de passe aux comptes créés par téléphone.
 export const DOMAINE_TEL = "tel.fh-portes.com";
+
+// Inscription / connexion par téléphone (SMS) : désactivée dans cette version.
+// L'activer suppose un plan Firebase payant et des tests complets (envoi de code,
+// connexion, récupération). Ne passer à true qu'après ces tests.
+export const TEL_ACTIF = false;

@@ -1,5 +1,14 @@
 /* Espace client FAHIMA PORTES — Firebase Authentication (e-mail ou téléphone + mot de passe) */
-import { firebaseConfig, DOMAINE_TEL } from "./firebase-config.js";
+import { firebaseConfig, DOMAINE_TEL, TEL_ACTIF } from "./firebase-config.js";
+
+// Inscription / connexion par téléphone (SMS) : désactivée dans cette version.
+// Pour l'activer plus tard : passer TEL_ACTIF à true dans firebase-config.js
+// puis tester l'envoi de code, la connexion et la récupération de compte.
+if (!TEL_ACTIF) {
+  document.querySelectorAll('input[value="phone"]').forEach((r) => { r.disabled = true; });
+  document.querySelectorAll(".par-phone").forEach((e) => { e.hidden = true; });
+  document.querySelectorAll(".methode").forEach((g) => { g.hidden = true; });
+}
 
 const $ = (id) => document.getElementById(id);
 const t = (k, v) => window.FH.t(k, v);

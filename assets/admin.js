@@ -12,7 +12,7 @@ let db = null;
 let utilisateur = null;
 let produits = [];
 let editionId = null; // null = création d'une offre
-let ecouteActif = false;
+let arreterEcoute = null; // désabonnement de l'écoute Firestore
 
 const TYPES = ["blindee", "fer-forge", "simple", "double", "chambre", "salon"];
 
@@ -45,16 +45,25 @@ async function demarrer() {
 
 async function gererUtilisateur(u) {
   utilisateur = u;
+  arreterEcouteCatalogue();
+  produits = [];
+  fermerFormulaire();
+  $("btn-importer").hidden = true;
   if (!u) { montrerVue("vue-connexion"); return; }
   let admin = false;
   try {
     const s = await fstore.getDoc(fstore.doc(db, "admins", u.uid));
     admin = s.exists();
   } catch (e) { admin = false; }
+  if (u !== utilisateur) return; // l'utilisateur a changé pendant la vérification
   if (!admin) { montrerVue("vue-refuse"); return; }
   $("admin-email-affiche").textContent = u.email || u.phoneNumber || "";
   montrerVue("vue-admin");
   ecouterProduits();
+}
+
+function arreterEcouteCatalogue() {
+  if (arreterEcoute) { try { arreterEcoute(); } catch (e) {} arreterEcoute = null; }
 }
 
 // ---------- Connexion ----------
@@ -79,9 +88,8 @@ $("btn-refuse-logout").addEventListener("click", () => auth && fb.signOut(auth))
 
 // ---------- Lecture du catalogue ----------
 function ecouterProduits() {
-  if (ecouteActif) return;
-  ecouteActif = true;
-  fstore.onSnapshot(
+  arreterEcouteCatalogue();
+  arreterEcoute = fstore.onSnapshot(
     fstore.query(fstore.collection(db, "products"), fstore.orderBy("ordre")),
     (snap) => {
       produits = snap.docs.map((d) => Object.assign({ id: d.id }, d.data()));
@@ -104,7 +112,7 @@ function rendreListe() {
     ligne.className = "ligne-produit";
     const typesTxt = (p.types || []).join(", ");
     ligne.innerHTML =
-      '<img src="' + esc(p.img) + '" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">' +
+      '<img alt="" loading="lazy">' +
       '<div class="infos-ligne"><p class="nom-ligne">' + esc((p.fr && p.fr.n) || p.id) + '</p>' +
       '<p class="details-ligne">' + esc(Number(p.eur).toFixed(2)) + ' € · ' + esc(typesTxt) +
       (p.visible ? "" : ' · <span class="cache">masquée</span>') + '</p></div>' +
@@ -113,6 +121,9 @@ function rendreListe() {
       '<button type="button" class="secondaire btn-mini" data-act="visible">' + (p.visible ? "Masquer" : "Afficher") + '</button>' +
       '<button type="button" class="secondaire btn-mini danger" data-act="supprimer">Supprimer</button>' +
       '</div>';
+    const image = ligne.querySelector("img");
+    image.src = p.img; // affectation directe : jamais insérée dans du HTML
+    image.onerror = function () { image.style.visibility = "hidden"; };
     ligne.querySelectorAll("button").forEach((b) =>
       b.addEventListener("click", () => actionLigne(b.dataset.act, p)));
     zone.appendChild(ligne);
@@ -197,6 +208,9 @@ $("form-produit").addEventListener("submit", async (e) => {
   if (!(eur > 0)) return message("Indiquez un prix valide en euros.");
   if (!types.length) return message("Choisissez au moins une catégorie.");
   if (!img) return message("Indiquez une image (nom de fichier ou adresse https).");
+  // Image : nom de fichier du site (produit-XX.webp…) ou adresse https complète
+  if (!/^(https:\/\/[^\s"']+|[a-z0-9][a-z0-9-_.]*\.(webp|png|jpe?g))$/i.test(img))
+    return message("Image non valide : indiquez un nom de fichier du site (ex. produit-10.webp) ou une adresse https complète.");
   if (!(ordre >= 1)) return message("Indiquez une position valide (1 ou plus).");
 
   const fr = { n: nomFr, d: descFr, f: lignes("p-caract-fr") };
@@ -220,12 +234,17 @@ $("btn-importer").addEventListener("click", async () => {
   if (!db) return;
   if (!confirm("Importer les 8 modèles actuels dans la base ? Vous pourrez ensuite les modifier.")) return;
   try {
+    let ajoutes = 0;
     for (let i = 0; i < PRODUITS_INITIAUX.length; i++) {
       const p = PRODUITS_INITIAUX[i];
+      const ref = fstore.doc(db, "products", p.id);
+      const existant = await fstore.getDoc(ref);
+      if (existant.exists()) continue; // n'écrase jamais une offre déjà enregistrée
       const donnees = Object.assign({ ordre: i + 1, visible: true }, p);
-      await fstore.setDoc(fstore.doc(db, "products", p.id), donnees);
+      await fstore.setDoc(ref, donnees);
+      ajoutes++;
     }
-    message("Catalogue importé : vous pouvez maintenant modifier les offres.", "ok");
+    message("Import terminé : " + ajoutes + " offre(s) ajoutée(s), les offres existantes ont été conservées.", "ok");
   } catch (err) {
     message("Import impossible : " + err.message);
   }
