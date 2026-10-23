@@ -1,8 +1,8 @@
 /* Catalogue FAHIMA PORTES — produits, filtres, demande de devis,
    favoris et avis clients (notes + commentaires) via Firestore. */
-import { PRODUITS_INITIAUX } from "./produits-initiaux.js?v=20261031";
-import { firebaseConfig } from "./firebase-config.js?v=20261031";
-import { session } from "./session.js?v=20261031";
+import { PRODUITS_INITIAUX } from "./produits-initiaux.js?v=20261101";
+import { firebaseConfig } from "./firebase-config.js?v=20261101";
+import { session } from "./session.js?v=20261101";
 
 (function () {
   // Prix de référence en euros (convertis automatiquement en dinars)
@@ -437,6 +437,7 @@ import { session } from "./session.js?v=20261031";
     msg.hidden = true;
     majChampAdresse();
     fenetreCommande.classList.add("active");
+    fenetreCommande.scrollTop = 0;
   }
 
   function majChampAdresse() {
