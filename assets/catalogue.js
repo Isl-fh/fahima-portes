@@ -31,6 +31,7 @@ import { session } from "./session.js?v=20261103";
     return "★★★★★".slice(0, note) + "☆☆☆☆☆".slice(0, 5 - note);
   }
 
+  var modeleInitial = new URLSearchParams(location.search).get("modele");
   function rendre() {
     var L = FH.etat.lang;
     grille.querySelectorAll(".porte").forEach(function (c) { c.remove(); });
@@ -50,6 +51,7 @@ import { session } from "./session.js?v=20261103";
         '<p class="description">' + esc(x.d) + "</p>" +
         '<p class="prix"><small>' + esc(FH.t("cat.from")) + "</small>" + esc(FH.prix(p.eur)) + "</p>" +
         '<ul class="details">' + x.f.map(function (f) { return "<li>" + esc(f) + "</li>"; }).join("") + "</ul>" +
+        '<a class="modele-link" href="modele.html?id=' + encodeURIComponent(p.id) + '">' + esc(texteProjet('details')) + '</a>' +
         '<button class="commander" type="button">' + esc(FH.t("cmd.btn")) + "</button>" +
         '<button class="devis" type="button">' + esc(FH.t("cat.quote")) + "</button>" +
         "</div>";
@@ -76,6 +78,7 @@ import { session } from "./session.js?v=20261103";
     }
     prixMin.step = prixMax.step = FH.etat.cur === "EUR" ? "1" : "1000";
     filtrer();
+    if(modeleInitial){var cible=PRODUITS.find(function(p){return p.id===modeleInitial;});if(cible){modeleInitial=null;ouvrir(cible);}}
   }
 
   // ---------- Favoris ----------
@@ -329,7 +332,10 @@ import { session } from "./session.js?v=20261103";
   var formulaire = document.getElementById("formulaire");
   var produitChoisi = null;
 
+  var boutonDevisOrigine = null;
   function ouvrir(p) {
+    boutonDevisOrigine = document.activeElement;
+    document.getElementById("devis-statut").textContent = "";
     produitChoisi = p;
     document.getElementById("produit").value = (p[FH.etat.lang] || p.fr).n + " — " + FH.prix(p.eur);
     var u = null;
@@ -345,14 +351,18 @@ import { session } from "./session.js?v=20261103";
     fenetre.classList.add("active");
     document.getElementById("nom").focus();
   }
-  function fermer() { fenetre.classList.remove("active"); }
+  function fermer() {
+    if (!fenetre.classList.contains("active")) return;
+    fenetre.classList.remove("active");
+    if (boutonDevisOrigine) boutonDevisOrigine.focus();
+  }
   document.getElementById("fermer").addEventListener("click", fermer);
   fenetre.addEventListener("click", function (e) { if (e.target === fenetre) fermer(); });
   document.addEventListener("keydown", function (e) { if (e.key === "Escape") fermer(); });
 
   // Enregistre la demande dans l'espace client (si connecté).
   async function memoriserDemande(d) {
-    if (!session.user || !session.fstore || !session.db) return;
+    if (!session.user || !session.fstore || !session.db) return false;
     try {
       await session.fstore.addDoc(session.fstore.collection(session.db, "devis"), {
         uid: session.user.uid,
@@ -366,13 +376,25 @@ import { session } from "./session.js?v=20261103";
         langue: FH.etat.lang,
         date: session.fstore.serverTimestamp()
       });
-    } catch (e) { console.warn("Demande non enregistrée dans l'espace client.", e); }
+      return true;
+    } catch (e) { console.warn("Demande non enregistrée dans l'espace client.", e); return false; }
   }
+
+  function donneesDevis(){var d=new FormData(formulaire);var mesures='Quantité : '+d.get('quantite')+'\nOuverture (cm) : '+(d.get('largeur')||'à préciser')+' × '+(d.get('hauteur')||'à préciser');d.set('message',mesures+'\n'+(d.get('message')||''));return d;}
+  function texteProjet(cle) { var d=window.FH_PROJET; return d ? (d[FH.etat.lang]||d.fr)[cle] : cle; }
+  function afficherDevis(cle) { document.getElementById('devis-statut').textContent=texteProjet(cle); }
+  document.getElementById('enregistrer-devis').addEventListener('click', async function(){
+    if(!formulaire.reportValidity()) return;
+    if(!session.user) { afficherDevis('login'); return; }
+    var b=this; b.disabled=true;
+    try { var ok=await memoriserDemande(donneesDevis()); afficherDevis(ok?'saved':'saveError'); }
+    finally { b.disabled=false; }
+  });
 
   formulaire.addEventListener("submit", async function (e) {
     e.preventDefault();
-    var d = new FormData(formulaire);
-    await memoriserDemande(d);
+    var d = donneesDevis();
+    afficherDevis("mail");
     var nomFr = produitChoisi ? produitChoisi.fr.n : d.get("produit");
     var prixTxt = produitChoisi ? FH.prix(produitChoisi.eur) : "";
     var sujet = encodeURIComponent("Demande de devis - " + nomFr);
@@ -386,14 +408,14 @@ import { session } from "./session.js?v=20261103";
       "Langue du client : " + FH.etat.lang.toUpperCase() + "\n\n" +
       "Ma demande :\n" + d.get("message")
     );
-    window.location.href = "mailto:islamefh2@gmail.com?subject=" + sujet + "&body=" + corps;
+    window.location.href = "mailto:contact@fh-portes.com?subject=" + sujet + "&body=" + corps;
   });
 
   // Envoi du devis par WhatsApp (message dans la langue active)
   document.getElementById("envoyer-wa").addEventListener("click", async function () {
     if (!formulaire.reportValidity()) return;
-    var d = new FormData(formulaire);
-    await memoriserDemande(d);
+    var d = donneesDevis();
+    afficherDevis("wa");
     var L = FH.etat.lang;
     var prod = produitChoisi ? (produitChoisi[L] || produitChoisi.fr) : null;
     var nomModele = prod ? prod.n : d.get("produit");
@@ -465,6 +487,8 @@ import { session } from "./session.js?v=20261103";
     var adresse = document.getElementById("cmd-adresse").value.trim();
     var message = document.getElementById("cmd-message").value.trim();
     function erreur(txt) { msg.hidden = false; msg.textContent = txt; }
+    if (!session.user.emailVerified) return erreur(texteProjet("verify"));
+    if (email !== String(session.user.email || "").toLowerCase()) return erreur(FH.t("err.email"));
     if (!nom || !tel || !email) return erreur(FH.t("err.required"));
     if (email.indexOf("@") < 1) return erreur(FH.t("err.email"));
     if (typeLivraison === "livraison" && adresse.length < 5) return erreur(FH.t("cmd.adresse.erreur"));

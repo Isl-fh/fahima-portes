@@ -23,6 +23,8 @@
     <script src="assets/i18n.js?v=20261103"></script>
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"FAHIMA PORTES","url":"https://www.fh-portes.com","logo":"https://www.fh-portes.com/icon-512.png","foundingDate":"2019"}</script>
     <link rel="stylesheet" href="assets/accueil.css">
+<link rel="stylesheet" href="assets/projet.css">
+<link rel="canonical" href="https://www.fh-portes.com/">
 </head>
 <body>
     <header class="site-header transparent">
@@ -41,14 +43,14 @@
                 </div>
             </div>
         </div>
-        <nav class="mainnav">
+        <a class="skip-link" href="#contenu">Aller au contenu</a><nav class="mainnav">
             <div class="brand-group">
-                <a class="logo-btn" href="index.html" data-i18n-attr="title:nav.account;aria-label:nav.account">
+                <a class="logo-btn" href="index.html" data-i18n-attr="title:nav.home;aria-label:nav.home">
                     <img src="logo-fahima.png" alt="FAHIMA" width="62" height="62">
                     </a>
                 <a class="brand" href="index.html">FAHIMA PORTES</a>
             </div>
-            <div class="navigation">
+            <button type="button" class="projet-menu" aria-expanded="false" aria-controls="navigation-mobile" data-projet="menu">Menu</button><div class="navigation" id="navigation-mobile">
                 <a class="hide-sm" href="#usine" data-i18n="nav.factory">Notre usine</a>
                 <a class="hide-sm" href="#gammes" data-i18n="nav.ranges">Nos gammes</a>
                 <a class="hide-sm" href="#contact" data-i18n="nav.contact">Contact</a>
@@ -58,15 +60,15 @@
         </nav>
     </header>
 
-    <main>
+    <main id="contenu">
         <section class="hero">
             <div class="hero-content">
                 <span class="ligne-or"></span>
                 <div class="sur-titre" data-i18n="hero.kicker">Fabricant de portes depuis 2019</div>
                 <h1><span data-i18n="hero.title1">L'élégance de la sécurité,</span> <em data-i18n="hero.title2">la force du prestige.</em></h1>
                 <p class="hero-description" data-i18n="hero.text"></p>
-                <div class="actions">
-                    <a class="bouton-or" href="catalogue.html" data-i18n="hero.cta">Découvrir nos créations</a>
+                <div class="actions"><a class="bouton-or projet-devis" href="catalogue.html#catalogue" data-projet="quote">Demander un devis</a>
+                    <a class="bouton-simple" href="catalogue.html" data-i18n="hero.cta">Découvrir nos créations</a>
                     <a class="bouton-simple" href="#usine" data-i18n="hero.more">Notre histoire</a>
                 </div>
             </div>
@@ -76,7 +78,7 @@
             </div>
         </section>
 
-        <section class="prestige">
+        <section class="projet-section" id="projet"><h2 class="" data-projet="process">Une porte pensée pour votre projet</h2><div class="projet-steps"><article><span class="step-no">01</span><h3 class="" data-projet="step1">Choisissez votre modèle</h3><p class="" data-projet="step1p">Explorez les finitions et les styles de notre catalogue.</p></article><article><span class="step-no">02</span><h3 class="" data-projet="step2">Précisons votre besoin</h3><p class="" data-projet="step2p">Dimensions, sens d’ouverture, quantité et lieu de livraison : nous préparons votre demande ensemble.</p></article><article><span class="step-no">03</span><h3 class="" data-projet="step3">Validez votre devis</h3><p class="" data-projet="step3p">Confirmez le prix, les délais, la livraison et la pose avant de vous engager.</p></article></div></section><section class="prestige">
             <article class="prestige-item"><span class="icone">◈</span><h2 data-i18n="values.v1.h"></h2><p data-i18n="values.v1.p"></p></article>
             <article class="prestige-item"><span class="icone">✦</span><h2 data-i18n="values.v2.h"></h2><p data-i18n="values.v2.p"></p></article>
             <article class="prestige-item"><span class="icone">♢</span><h2 data-i18n="values.v3.h"></h2><p data-i18n="values.v3.p"></p></article>
@@ -137,9 +139,9 @@
 
         <section class="galerie" id="galerie">
             <div class="entete-section">
-                <div class="petit-titre" data-i18n="gallery.kicker">Nos réalisations</div>
-                <h2 data-i18n="gallery.title"></h2>
-                <p class="galerie-intro" data-i18n="gallery.text"></p>
+                <div class="petit-titre" data-projet-gallery="kicker">Nos réalisations</div>
+                <h2 data-projet-gallery="title"></h2>
+                <p class="galerie-intro" data-projet-gallery="text"></p>
             </div>
             <div class="galerie-grille">
                 <figure class="realisation"><img src="produit-01.webp" alt="Modèle Géométrique" width="1024" height="1024" loading="lazy"><figcaption data-i18n="gallery.g1"></figcaption></figure>
@@ -151,7 +153,7 @@
             </div>
         </section>
 
-        <section class="temoignages" id="temoignages">
+        <section class="projet-quality"><div><h2 class="" data-projet="quality">La qualité se vérifie dans les détails</h2><p class="" data-projet="qualityp">Avant de choisir, faites confirmer la composition, le système de fermeture, les performances documentées et les conditions de garantie de votre modèle.</p><h3 class="" data-projet="spec">Les points à confirmer dans votre devis</h3><p class="" data-projet="specp">Dimensions • composition et épaisseur • serrure • sens d’ouverture • finitions • garantie • délai • transport et pose.</p></div><a class="bouton-or" href="catalogue.html" data-projet="qualitycta">Préparer mon projet</a></section><section class="projet-section projet-faq" id="questions"><h2 class="" data-projet="faq">Les réponses à vos questions</h2><details><summary data-projet="q1">Puis-je demander une porte sur mesure ?</summary><p class="" data-projet="a1">Indiquez les dimensions de votre ouverture et le modèle souhaité. Notre équipe confirmera la faisabilité et le prix dans un devis.</p></details><details><summary data-projet="q2">Comment connaître le prix final ?</summary><p class="" data-projet="a2">Le prix dépend du modèle et des options retenues. Demandez un devis précisant les dimensions, la finition, le transport et la pose éventuelle.</p></details><details><summary data-projet="q3">Où livrez-vous et proposez-vous la pose ?</summary><p class="" data-projet="a3">Notre usine est à Khelil, en Algérie. Communiquez le lieu du projet pour faire confirmer la disponibilité, les frais de livraison et la pose éventuelle.</p></details><details><summary data-projet="q4">Comment vérifier les performances d’une porte ?</summary><p class="" data-projet="a4">Demandez la fiche technique et, pour une performance certifiée, le certificat correspondant au modèle et à sa configuration.</p></details><details><summary data-projet="q5">Faut-il créer un compte pour demander un devis ?</summary><p class="" data-projet="a5">Vous pouvez nous contacter directement par WhatsApp ou par e-mail. Un compte permet aussi de conserver votre demande dans votre espace client.</p></details></section><section class="temoignages" id="temoignages">
             <div class="entete-section">
                 <div class="petit-titre" data-i18n="testi.kicker">Ils nous font confiance</div>
                 <h2 data-i18n="testi.title"></h2>
@@ -193,7 +195,7 @@
                     <div class="coordonnee"><dt data-i18n="contact.address.h"></dt><dd data-i18n="contact.address.v"></dd></div>
                     <div class="coordonnee"><dt data-i18n="contact.phone.h"></dt><dd><a href="tel:+33784885023" dir="ltr">+33 7 84 88 50 23</a></dd></div>
                     <div class="coordonnee"><dt data-i18n="contact.whatsapp.h"></dt><dd><a class="lien-whatsapp" data-wa="33784885023" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.4A10 10 0 1 0 12 2Zm0 18.2c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-2.9.8.8-2.8-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.6-6.1c-.3-.1-1.6-.8-1.8-.9-.2-.1-.4-.1-.6.1-.2.3-.6.9-.8 1.1-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4 0-.5.1-.7l.4-.5c.1-.2.2-.3.3-.5v-.4c0-.1-.6-1.4-.8-1.9-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 1.7 2.7 4.2 3.7.6.3 1 .4 1.4.5.6.2 1.1.2 1.5.1.5 0 1.6-.6 1.8-1.3.2-.6.2-1.1.2-1.2l-.4-.3Z"/></svg><span data-i18n="contact.whatsapp.b"></span></a></dd></div>
-                    <div class="coordonnee"><dt data-i18n="contact.email.h"></dt><dd><a href="mailto:islamefh2@gmail.com" dir="ltr">islamefh2@gmail.com</a></dd></div>
+                    <div class="coordonnee"><dt data-i18n="contact.email.h"></dt><dd><a href="mailto:contact@fh-portes.com" dir="ltr">contact@fh-portes.com</a></dd></div>
                     <div class="coordonnee"><dt data-i18n="contact.hours.h"></dt><dd data-i18n="contact.hours.v"></dd></div>
                 </dl>
             </div>
@@ -217,7 +219,7 @@
         <p>&copy; 2026 <span data-i18n="footer.text">FAHIMA PORTES</span></p>
         <p class="rate" data-rate></p>
         <div class="flags"><span class="flag" data-i18n-attr="title:flag.dz;aria-label:flag.dz" role="img"><svg viewBox="0 0 900 600" aria-hidden="true"><rect width="450" height="600" fill="#006233"/><rect x="450" width="450" height="600" fill="#fff"/><mask id="mdzf"><rect width="900" height="600" fill="#fff"/><circle cx="487.5" cy="300" r="120" fill="#000"/></mask><circle cx="450" cy="300" r="150" fill="#d21034" mask="url(#mdzf)"/><polygon fill="#d21034" points="450.0,300.0 501.8,283.2 501.8,228.7 533.9,272.8 585.7,255.9 553.6,300.0 585.7,344.1 533.9,327.2 501.8,371.3 501.8,316.8"/></svg></span><span class="flag" data-i18n-attr="title:flag.tr;aria-label:flag.tr" role="img"><svg viewBox="0 0 900 600" aria-hidden="true"><rect width="900" height="600" fill="#e30a17"/><mask id="mtrf"><rect width="900" height="600" fill="#fff"/><circle cx="337.5" cy="300" r="120" fill="#000"/></mask><circle cx="300" cy="300" r="150" fill="#fff" mask="url(#mtrf)"/><polygon fill="#fff" points="425.0,300.0 476.8,283.2 476.8,228.7 508.9,272.8 560.7,255.9 528.6,300.0 560.7,344.1 508.9,327.2 476.8,371.3 476.8,316.8"/></svg></span></div>
-    </footer>
+    <nav class="projet-footer" aria-label="Informations"><a href="livraison.html" data-projet="delivery">Livraison et pose</a><a href="confidentialite.html" data-projet="privacy">Données personnelles</a><a href="entreprise.html" data-projet="legal">Informations entreprise</a></nav></footer>
     <script>
     /* Visionneuse de la galerie */
     (function () {
@@ -253,5 +255,6 @@
     <a class="wa-float" data-wa="33784885023" target="_blank" rel="noopener" aria-label="WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.4A10 10 0 1 0 12 2Zm0 18.2c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-2.9.8.8-2.8-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.6-6.1c-.3-.1-1.6-.8-1.8-.9-.2-.1-.4-.1-.6.1-.2.3-.6.9-.8 1.1-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4 0-.5.1-.7l.4-.5c.1-.2.2-.3.3-.5v-.4c0-.1-.6-1.4-.8-1.9-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 1.7 2.7 4.2 3.7.6.3 1 .4 1.4.5.6.2 1.1.2 1.5.1.5 0 1.6-.6 1.8-1.3.2-.6.2-1.1.2-1.2l-.4-.3Z"/></svg></a>
     <script type="module" src="assets/session.js?v=20261103"></script>
     <script type="module" src="assets/accueil-avis.js?v=20261103"></script>
+<script src="assets/projet-textes.js"></script><script src="assets/projet.js"></script>
 </body>
 </html>

@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /compte.html
+Sitemap: https://www.fh-portes.com/sitemap.xml

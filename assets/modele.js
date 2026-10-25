@@ -1,0 +1,7 @@
+import {session} from './session.js';
+import {PRODUITS_INITIAUX} from './produits-initiaux.js';
+import {firebaseConfig} from './firebase-config.js';
+const id=new URLSearchParams(location.search).get('id'); let produit;
+function afficher(){if(!produit)return;const x=produit[FH.etat.lang]||produit.fr;document.getElementById('modele-nom').textContent=x.n;document.title=x.n+' | FAHIMA PORTES';document.getElementById('modele-description').textContent=x.d;const img=document.getElementById('modele-image');img.src=produit.img;img.alt=x.n;const ul=document.getElementById('modele-atouts');ul.replaceChildren();(x.f||[]).forEach(t=>{let li=document.createElement('li');li.textContent=t;ul.append(li);});document.getElementById('modele-devis').href='catalogue.html?modele='+encodeURIComponent(id)+'#catalogue';document.getElementById('modele-detail').hidden=false;document.getElementById('modele-etat').hidden=true;}
+document.addEventListener('fh:change',afficher);
+try{if(!id||!id.match(/^[a-z0-9-]{1,60}$/))throw Error('id');if(firebaseConfig.apiKey==='A_REMPLIR'){produit=PRODUITS_INITIAUX.find(p=>p.id===id);}else{await session.quand;const F=session.fstore;const snap=await F.getDoc(F.doc(session.db,'products',id));if(snap.exists()&&snap.data().visible)produit=snap.data();}if(!produit)throw Error('missing');afficher();}catch(e){document.getElementById('modele-etat').textContent='Modèle indisponible. Consultez le catalogue ou contactez notre équipe.';}

@@ -17,6 +17,8 @@
     <link rel="stylesheet" href="assets/site.css">
     <script src="assets/i18n.js?v=20261103"></script>
     <link rel="stylesheet" href="assets/catalogue.css">
+<link rel="stylesheet" href="assets/projet.css">
+<link rel="canonical" href="https://www.fh-portes.com/catalogue.html">
 </head>
 <body>
     <header class="site-header">
@@ -35,21 +37,21 @@
                 </div>
             </div>
         </div>
-        <nav class="mainnav">
+        <a class="skip-link" href="#contenu">Aller au contenu</a><nav class="mainnav">
             <div class="brand-group">
-                <a class="logo-btn" href="index.html" data-i18n-attr="title:nav.account;aria-label:nav.account">
+                <a class="logo-btn" href="index.html" data-i18n-attr="title:nav.home;aria-label:nav.home">
                     <img src="logo-fahima.png" alt="FAHIMA" width="62" height="62">
                     </a>
                 <a class="brand" href="index.html">FAHIMA PORTES</a>
             </div>
-            <div class="navigation">
+            <button type="button" class="projet-menu" aria-expanded="false" aria-controls="navigation-mobile" data-projet="menu">Menu</button><div class="navigation" id="navigation-mobile">
                 <a class="hide-sm" href="index.html" data-i18n="nav.home">Accueil</a>
                 <a class="account-link" href="compte.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span data-account-label>Se connecter</span></a>
             </div>
         </nav>
     </header>
 
-    <main>
+    <main id="contenu">
         <section class="intro">
             <small data-i18n="cat.kicker">Collection 2026</small>
             <h1><span class="h1a" data-i18n="cat.h1a">Le catalogue</span> <span>FAHIMA</span></h1>
@@ -95,13 +97,13 @@
                 <span data-i18n="cat.contact.call">Appelez le</span>
                 <a href="tel:+33784885023" dir="ltr">+33 7 84 88 50 23</a>
                 <span data-i18n="cat.contact.or">ou écrivez à</span>
-                <a href="mailto:islamefh2@gmail.com" dir="ltr">islamefh2@gmail.com</a>
+                <a href="mailto:contact@fh-portes.com" dir="ltr">contact@fh-portes.com</a>
             </p>
             <p class="contact-whatsapp">
                 <a class="lien-whatsapp" data-wa="33784885023" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.4A10 10 0 1 0 12 2Zm0 18.2c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-2.9.8.8-2.8-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.6-6.1c-.3-.1-1.6-.8-1.8-.9-.2-.1-.4-.1-.6.1-.2.3-.6.9-.8 1.1-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4 0-.5.1-.7l.4-.5c.1-.2.2-.3.3-.5v-.4c0-.1-.6-1.4-.8-1.9-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 1.7 2.7 4.2 3.7.6.3 1 .4 1.4.5.6.2 1.1.2 1.5.1.5 0 1.6-.6 1.8-1.3.2-.6.2-1.1.2-1.2l-.4-.3Z"/></svg><span data-i18n="contact.whatsapp.b"></span></a>
             </p>
         </section>
-    </main>
+    <section class="projet-section"><h2 class="" data-projet="spec">Les points à confirmer dans votre devis</h2><p class="" data-projet="specp">Dimensions • composition et épaisseur • serrure • sens d’ouverture • finitions • garantie • délai • transport et pose.</p><p class="" data-projet="deliveryp">Retrait à l’usine ou livraison selon votre projet : disponibilité, prix, délais et pose sont à confirmer dans le devis.</p></section></main>
 
     <div class="fenetre" id="fenetre" role="dialog" aria-modal="true" aria-labelledby="form-titre">
         <form class="formulaire" id="formulaire">
@@ -111,13 +113,13 @@
             <p class="prefill" id="prefill" data-i18n="form.prefill"></p>
             <div class="champ"><label for="produit" data-i18n="form.model"></label><input id="produit" name="produit" readonly></div>
             <div class="deux-champs">
-                <div class="champ"><label for="nom" data-i18n="form.name"></label><input id="nom" name="nom" autocomplete="name" required></div>
-                <div class="champ"><label for="telephone" data-i18n="form.phone"></label><input id="telephone" name="telephone" type="tel" autocomplete="tel" dir="ltr" required></div>
+                <div class="champ"><label for="nom" data-i18n="form.name"></label><input id="nom" name="nom" maxlength="80" autocomplete="name" required></div>
+                <div class="champ"><label for="telephone" data-i18n="form.phone"></label><input id="telephone" name="telephone" maxlength="30" type="tel" autocomplete="tel" dir="ltr" required></div>
             </div>
-            <div class="champ"><label for="email" data-i18n="form.email"></label><input id="email" name="email" type="email" autocomplete="email" dir="ltr" required></div>
-            <div class="champ"><label for="adresse" data-i18n="form.address"></label><input id="adresse" name="adresse" autocomplete="street-address"></div>
-            <div class="champ"><label for="message" data-i18n="form.msg"></label><textarea id="message" name="message" data-i18n-attr="placeholder:form.msg.ph"></textarea></div>
-            <button class="envoyer" type="submit" data-i18n="form.send"></button>
+            <div class="champ"><label for="email" data-i18n="form.email"></label><input id="email" name="email" maxlength="120" type="email" autocomplete="email" dir="ltr" required></div>
+            <div class="champ"><label for="adresse" data-i18n="form.address"></label><input id="adresse" name="adresse" maxlength="200" autocomplete="street-address"></div>
+            <div class="deux-champs"><div class="champ"><label for="largeur" data-projet="width">Largeur de l’ouverture (cm)</label><input id="largeur" name="largeur" type="number" min="1" max="1000" step="0.1"></div><div class="champ"><label for="hauteur" data-projet="height">Hauteur de l’ouverture (cm)</label><input id="hauteur" name="hauteur" type="number" min="1" max="1000" step="0.1"></div></div><div class="champ"><label for="quantite" data-projet="quantity">Quantité</label><input id="quantite" name="quantite" type="number" min="1" max="10000" value="1" required></div><div class="champ"><label for="message" data-i18n="form.msg"></label><textarea id="message" name="message" maxlength="850" data-i18n-attr="placeholder:form.msg.ph"></textarea></div>
+            <button class="envoyer" type="button" id="enregistrer-devis" data-projet="save">Enregistrer dans mon espace client</button><p id="devis-statut" role="status" aria-live="polite"></p><p class="note"><span data-projet="consent">Les informations saisies servent à traiter votre demande.</span> <a href="confidentialite.html" data-projet="privacy">Données personnelles</a></p><button class="envoyer" type="submit" data-i18n="form.send"></button>
             <button class="envoyer wa" type="button" id="envoyer-wa" data-i18n="form.sendwa"></button>
             <p class="note" data-i18n="form.note"></p>
         </form>
@@ -145,7 +147,7 @@
                     <label for="avis-texte" data-i18n="avis.commentaire">Votre commentaire</label>
                     <textarea id="avis-texte" rows="3" maxlength="400"></textarea>
                 </div>
-                <button class="envoyer" type="submit" data-i18n="avis.envoyer">Envoyer mon avis</button>
+                <p class="note"><span data-projet="consent">Les informations saisies servent à traiter votre demande.</span> <a href="confidentialite.html" data-projet="privacy">Données personnelles</a></p><button class="envoyer" type="submit" data-i18n="avis.envoyer">Envoyer mon avis</button>
             </form>
         </div>
     </div>
@@ -167,7 +169,7 @@
             </div>
             <div class="champ" id="cmd-adresse-champ"><label for="cmd-adresse" data-i18n="cmd.adresse"></label><input id="cmd-adresse" maxlength="200" autocomplete="street-address"></div>
             <div class="champ"><label for="cmd-message" data-i18n="cmd.msg"></label><textarea id="cmd-message" rows="2" maxlength="500"></textarea></div>
-            <button class="envoyer" type="submit" data-i18n="cmd.envoyer"></button>
+            <p class="note"><span data-projet="consent">Les informations saisies servent à traiter votre demande.</span> <a href="confidentialite.html" data-projet="privacy">Données personnelles</a></p><button class="envoyer" type="submit" data-i18n="cmd.envoyer"></button>
             <p class="alerte" id="cmd-msg" hidden></p>
         </form>
     </div>
@@ -177,8 +179,9 @@
         <p>&copy; 2026 <span data-i18n="footer.text">FAHIMA PORTES</span></p>
         <p class="rate" data-rate></p>
         <div class="flags"><span class="flag" data-i18n-attr="title:flag.dz;aria-label:flag.dz" role="img"><svg viewBox="0 0 900 600" aria-hidden="true"><rect width="450" height="600" fill="#006233"/><rect x="450" width="450" height="600" fill="#fff"/><mask id="mdzf"><rect width="900" height="600" fill="#fff"/><circle cx="487.5" cy="300" r="120" fill="#000"/></mask><circle cx="450" cy="300" r="150" fill="#d21034" mask="url(#mdzf)"/><polygon fill="#d21034" points="450.0,300.0 501.8,283.2 501.8,228.7 533.9,272.8 585.7,255.9 553.6,300.0 585.7,344.1 533.9,327.2 501.8,371.3 501.8,316.8"/></svg></span><span class="flag" data-i18n-attr="title:flag.tr;aria-label:flag.tr" role="img"><svg viewBox="0 0 900 600" aria-hidden="true"><rect width="900" height="600" fill="#e30a17"/><mask id="mtrf"><rect width="900" height="600" fill="#fff"/><circle cx="337.5" cy="300" r="120" fill="#000"/></mask><circle cx="300" cy="300" r="150" fill="#fff" mask="url(#mtrf)"/><polygon fill="#fff" points="425.0,300.0 476.8,283.2 476.8,228.7 508.9,272.8 560.7,255.9 528.6,300.0 560.7,344.1 508.9,327.2 476.8,371.3 476.8,316.8"/></svg></span></div>
-    </footer>
-    <script type="module" src="assets/catalogue.js?v=20261103"></script>
+    <nav class="projet-footer" aria-label="Informations"><a href="livraison.html" data-projet="delivery">Livraison et pose</a><a href="confidentialite.html" data-projet="privacy">Données personnelles</a><a href="entreprise.html" data-projet="legal">Informations entreprise</a></nav></footer>
+    <script type="module" src="assets/catalogue.js?v=20261025-release1"></script>
     <a class="wa-float" data-wa="33784885023" target="_blank" rel="noopener" aria-label="WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.4A10 10 0 1 0 12 2Zm0 18.2c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-2.9.8.8-2.8-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.6-6.1c-.3-.1-1.6-.8-1.8-.9-.2-.1-.4-.1-.6.1-.2.3-.6.9-.8 1.1-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4 0-.5.1-.7l.4-.5c.1-.2.2-.3.3-.5v-.4c0-.1-.6-1.4-.8-1.9-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 1.7 2.7 4.2 3.7.6.3 1 .4 1.4.5.6.2 1.1.2 1.5.1.5 0 1.6-.6 1.8-1.3.2-.6.2-1.1.2-1.2l-.4-.3Z"/></svg></a>
+<script src="assets/projet-textes.js"></script><script src="assets/projet.js"></script>
 </body>
 </html>
